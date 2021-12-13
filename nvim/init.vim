@@ -133,25 +133,24 @@ endif
 call plug#begin(data_dir . '/plugins')
 
 source ~/.config/nvim/plugins/airline.vim
-source ~/.config/nvim/plugins/vimspector.vim
 source ~/.config/nvim/plugins/editorconfig.vim
 source ~/.config/nvim/plugins/lsp.vim
 source ~/.config/nvim/plugins/markdown-composer.vim
 source ~/.config/nvim/plugins/onedark.vim
 source ~/.config/nvim/plugins/quickscope.vim
 source ~/.config/nvim/plugins/telescope.vim
+source ~/.config/nvim/plugins/tmux.nvim.vim
+source ~/.config/nvim/plugins/vimspector.vim
 
 Plug 'ap/vim-css-color'
 Plug 'mbbill/undotree'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
+Plug 'sheerun/vim-polyglot'
 Plug 'tmhedberg/SimpylFold'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
-Plug 'sheerun/vim-polyglot'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'JamshedVesuna/vim-markdown-preview'
 
 call plug#end()
 
