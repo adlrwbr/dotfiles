@@ -101,7 +101,7 @@ function! BetterGX()
     endif
     call netrw#BrowseX(l:link, netrw#CheckIfRemote())
 endfunction
-nnoremap gx :call BetterGX()<cr>
+noremap <silent> gx :call BetterGX()<CR>
 
 " Quickly insert trailing ;
 nnoremap <leader>; A;<esc>
@@ -121,9 +121,6 @@ noremap <C-k> <C-w>k
 
 " Temporarily stop search highlighting
 noremap <leader>/ :noh<CR>
-
-" Make Y behave like other capitals
-nnoremap Y y$
 
 " Open the current file in the default program
 nmap <leader>x :!xdg-open %<cr><cr>
