@@ -35,7 +35,8 @@ set foldmethod=expr
   \ foldexpr=lsp#ui#vim#folding#foldexpr()
   \ foldtext=lsp#ui#vim#folding#foldtext()
 
-lua <<EOF
+function LSPSetup()
+lua << EOF
   local cmp = require'cmp'
     cmp.setup({
         snippet = {
@@ -136,3 +137,9 @@ vim.api.nvim_set_keymap("i", "<C-E>", "<Plug>luasnip-next-choice", {})
 vim.api.nvim_set_keymap("s", "<C-E>", "<Plug>luasnip-next-choice", {})
 -- END attempt at Luasnip config
 EOF
+endfunction
+
+augroup LSPSetup
+    autocmd!
+    autocmd User PlugLoaded call LSPSetup()
+augroup end
