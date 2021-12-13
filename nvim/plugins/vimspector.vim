@@ -1,13 +1,3 @@
-"
-"                                     __
-"                                    /__\
-"                                   /(__)\
-"                                  (__)(__)
-"
-"                             github.com/adlrwbr
-"                       Made with ⌛&♥  by Adler Weber
-
-
 " Debugger remaps
 nnoremap <leader>m :MaximizerToggle!<CR>
 nnoremap <leader>dd :call vimspector#Launch()<CR>

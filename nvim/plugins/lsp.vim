@@ -1,12 +1,20 @@
-"
-"                                     __
-"                                    /__\
-"                                   /(__)\
-"                                  (__)(__)
-"
-"                             github.com/adlrwbr
-"                       Made with ⌛&♥  by Adler Weber
+" LSP 
+Plug 'neovim/nvim-lspconfig'
 
+" Lanugage Server Autocomplete
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/nvim-cmp'
+
+" Snippets
+Plug 'L3MON4D3/LuaSnip'
+Plug 'saadparwaiz1/cmp_luasnip'
+Plug 'rafamadriz/friendly-snippets'
+
+" DAP
+Plug 'puremourning/vimspector', {
+  \ 'do': 'python3 install_gadget.py --enable-vscode-cpptools'
+  \ }
 
 nnoremap <leader>vd :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>vi :lua vim.lsp.buf.implementation()<CR>
@@ -28,7 +36,6 @@ set foldmethod=expr
   \ foldtext=lsp#ui#vim#folding#foldtext()
 
 lua <<EOF
-
   local cmp = require'cmp'
     cmp.setup({
         snippet = {
@@ -51,6 +58,7 @@ lua <<EOF
           { name = 'buffer' },
         })
   })
+
 
   -- Setup lspconfig.
   local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
