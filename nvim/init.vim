@@ -92,7 +92,16 @@ vnoremap > >gv
 " Allow gf to open non-existent files
 noremap gf :edit <cfile><cr>
 
-" TODO: map gx to open github links, which will help with plugin management
+" Open shorthand github repositories in the browser, else do normal gx
+" Greatly helps with plugin management
+function! BetterGX()
+    let l:link = expand('<cfile>')
+    if l:link =~ '^[^/]\+/[^/]\+$'
+        let l:link = 'https://github.com/' . l:link
+    endif
+    call netrw#BrowseX(l:link, netrw#CheckIfRemote())
+endfunction
+nnoremap gx :call BetterGX()<cr>
 
 " Quickly insert trailing ;
 nnoremap <leader>; A;<esc>
