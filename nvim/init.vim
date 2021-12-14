@@ -143,15 +143,15 @@ source ~/.config/nvim/plugins/onedark.vim
 source ~/.config/nvim/plugins/quickscope.vim
 source ~/.config/nvim/plugins/telescope.vim
 source ~/.config/nvim/plugins/tmux.nvim.vim
+source ~/.config/nvim/plugins/treesitter.vim
 source ~/.config/nvim/plugins/vimspector.vim
 
 Plug 'ap/vim-css-color'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'mbbill/undotree'
 Plug 'scrooloose/nerdtree'
-Plug 'scrooloose/syntastic'
+" Plug 'scrooloose/syntastic'
 Plug 'sheerun/vim-polyglot'
-Plug 'tmhedberg/SimpylFold'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'

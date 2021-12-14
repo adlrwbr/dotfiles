@@ -1,4 +1,3 @@
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " Recommends updating the parsers on update
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 
