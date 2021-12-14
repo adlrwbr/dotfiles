@@ -43,6 +43,7 @@ set sidescrolloff=8
 set nojoinspaces " insert only one space after '.?!' following join command
 set splitright
 set splitbelow
+set foldopen=jump,mark,percent,search
 set confirm
 set autoread " auto read detected file changes - undo with u
 set redrawtime=10000 " Allow more time for loading syntax on large files
@@ -77,10 +78,6 @@ inoremap <esc> <nop>
 " Center and unfold search results
 nnoremap n nzzzv
 nnoremap N Nzzzv
-
-" TODO Unfold go to line
-" nnoremap num gg ggzv
-" nnoremap num G ggzv
 
 " Past replace without copying
 vnoremap <leader>p "_dP
