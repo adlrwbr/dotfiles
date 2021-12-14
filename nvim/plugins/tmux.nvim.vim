@@ -1,6 +1,6 @@
 Plug 'aserowy/tmux.nvim'
 
-function TMUXSetup()
+function! TMUXSetup()
 lua << EOF
   require("tmux").setup({
     copy_sync = {
