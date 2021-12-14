@@ -138,9 +138,9 @@ endif
 
 call plug#begin(data_dir . '/plugins')
 
-source ~/.config/nvim/plugins/airline.vim
 source ~/.config/nvim/plugins/editorconfig.vim
 source ~/.config/nvim/plugins/lsp.vim
+source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/markdown-composer.vim
 source ~/.config/nvim/plugins/onedark.vim
 source ~/.config/nvim/plugins/quickscope.vim
@@ -149,6 +149,7 @@ source ~/.config/nvim/plugins/tmux.nvim.vim
 source ~/.config/nvim/plugins/vimspector.vim
 
 Plug 'ap/vim-css-color'
+Plug 'kyazdani42/nvim-web-devicons'
 Plug 'mbbill/undotree'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
