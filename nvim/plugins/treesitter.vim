@@ -7,8 +7,8 @@ Plug 'lewis6991/spellsitter.nvim'
 
 " Folding
 set foldmethod=expr
-set foldexpr=nvim_treesitter#lsp#ui#vim#folding#foldexpr()
-set foldtext=lsp#ui#vim#folding#foldtext()
+set foldlevelstart=99
+set foldexpr=nvim_treesitter#foldexpr()
 
 function! TreeSitterSetup()
 lua << EOF
