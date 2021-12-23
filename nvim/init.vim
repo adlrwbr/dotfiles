@@ -75,6 +75,9 @@ vnoremap kj <esc>
 vnoremap KJ <esc>
 inoremap <esc> <nop>
 
+" Select all
+nnoremap <leader>a ggVG
+
 " Center and unfold search results
 nnoremap n nzzzv
 nnoremap N Nzzzv
