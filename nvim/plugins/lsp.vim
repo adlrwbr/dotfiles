@@ -12,6 +12,11 @@ Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-emoji'
 
+" Snippets
+Plug 'L3MON4D3/LuaSnip'
+Plug 'saadparwaiz1/cmp_luasnip'
+Plug 'rafamadriz/friendly-snippets'
+
 augroup LSPSetup
     autocmd!
     autocmd User PlugLoaded luafile ~/.config/nvim/plugins/lsp.lua

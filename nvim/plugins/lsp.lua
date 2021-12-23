@@ -21,8 +21,9 @@ nkeymap(']d', ':lua vim.diagnostic.goto_next()<CR>')
 nkeymap('<leader>q', ':lua vim.diagnostic.setloclist()<CR>')
 nkeymap('<leader>f', ':lua vim.lsp.buf.formatting()<CR>')
 
--- Setup nvim-cmp.
+-- Setup completion and snippet engine.
 local cmp = require'cmp'
+local luasnip = require'luasnip'
 cmp.setup({
     mapping = {
         ['<C-n>'] = cmp.mapping.select_next_item(),
@@ -30,34 +31,59 @@ cmp.setup({
         ['<C-u>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
         ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
         ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-        ['<C-e>'] = cmp.mapping({
-            i = cmp.mapping.abort(),
-            c = cmp.mapping.close(),
-        }),
-        -- Like JetBrains: Tab to replace, Enter to insert
+        ['<BS>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.close()
+            else
+                fallback()
+            end
+        end, { "i", "s" }),
+        -- Like JetBrains: Enter to insert, Tab to replace
         -- TODO: Insert not working. See https://github.com/hrsh7th/nvim-cmp/issues/664
         -- Accept currently selected item. If none selected, `select` first item.
         -- Set `select` to `false` to only confirm explicitly selected items.
         ['<CR>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true }),
-        ['<Tab>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+        ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })
+            elseif luasnip.expand_or_jumpable() then
+                luasnip.expand_or_jump()
+            else
+                fallback()
+            end
+        end, { "i", "s" }),
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+            else
+                fallback()
+            end
+        end, { "i", "s" }),
     },
     -- Priority of sources:
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
         { name = 'path' },
+        { name = 'luasnip' },
         { name = 'emoji' },
         { name = 'buffer', keyword_length = 4 },
     }),
+    snippet = {
+        expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+        end,
+    },
     formatting = {
         format = require("lspkind").cmp_format({
             with_text = true,
             menu = ({
+                -- latex_symbols = '[Latex]', -- TODO install
                 buffer = '[Buf]',
-                path = '[Path]',
+                emoji = '[Emoji]',
+                luasnip = '[LuaSnip]',
                 nvim_lsp = '[LSP]',
                 nvim_lua = '[API]',
-                emoji = '[Emoji]',
-                -- latex_symbols = '[Latex]', -- TODO install
+                path = '[Path]',
             })
         }),
     },
@@ -81,6 +107,13 @@ cmp.setup.cmdline(':', {
         { name = 'path' },
         { name = 'cmdline' }
     })
+})
+
+-- Load friendly snippets
+require("luasnip.loaders.from_vscode").lazy_load({
+    paths = "~/.local/share/nvim/plugged/friendly-snippets",
+    include = nil, -- Load all languages
+    exclude = {}
 })
 
 -- Advertise nvim-cmp support to LSPs (LSP can use snippets and whatnot)
