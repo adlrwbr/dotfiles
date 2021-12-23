@@ -1,30 +1,3 @@
--- LSP Installer
-local lsp_installer = require("nvim-lsp-installer")
-lsp_installer.on_server_ready(function(server)
-    local opts = {}
-    -- Make Lua language server aware of built-in vim globals
-    if server.name == "sumneko_lua" then
-        opts = {
-            settings = {
-                Lua = {
-                    diagnostics = {
-                        globals = { 'vim', 'use' }
-                    }
-                }
-            }
-        }
-    end
-    server:setup(opts)
-end)
-lsp_installer.settings({
-    ui = {
-        icons = {
-            server_installed = "✓",
-            server_pending = "➜",
-            server_uninstalled = "✗"
-        }
-    }
-})
 -- Key Mappings
 -- See `:help vim.lsp.*` for documentation on any of the below functions
 local function nkeymap(key, map)
@@ -110,13 +83,39 @@ cmp.setup.cmdline(':', {
     })
 })
 
--- Advertise nvim-cmp support to LSP (enables snippets and whatnot)
+-- Advertise nvim-cmp support to LSPs (LSP can use snippets and whatnot)
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-local servers = lsp_installer.get_installed_servers()
-for _, server in ipairs(servers) do
-    local server_name = server['name']
-    require('lspconfig')[server_name].setup {
-        -- cmd = {'/home/adler/.local/share/nvim/lsp_servers/sumneko_lua/extension/server/bin/lua-language-server'},
-        capabilities = capabilities
+
+-- Setup LSP installer
+local lsp_installer = require("nvim-lsp-installer")
+lsp_installer.settings({
+    ui = {
+        icons = {
+            server_installed = "✓",
+            server_pending = "➜",
+            server_uninstalled = "✗"
+        }
     }
-end
+})
+-- Setup LSP servers
+lsp_installer.on_server_ready(function(server)
+    local opts = {
+        capabilities = capabilities,
+    }
+    -- Make Lua language server aware of built-in vim globals
+    if server.name == "sumneko_lua" then
+        opts = {
+            capabilities = capabilities,
+            settings = {
+                Lua = {
+                    diagnostics = {
+                        globals = { 'vim', 'use' }
+                    }
+                }
+            }
+        }
+    end
+    -- This setup() function is exactly the same as lspconfig's setup function.
+    -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+    server:setup(opts)
+end)
