@@ -21,7 +21,9 @@ nkeymap(']d', ':lua vim.diagnostic.goto_next()<CR>')
 nkeymap('<leader>q', ':lua vim.diagnostic.setloclist()<CR>')
 nkeymap('<leader>f', ':lua vim.lsp.buf.formatting()<CR>')
 
--- Setup completion and snippet engine.
+-- Setup completion and snippet engine
+-- TODO: don't suggest snippet source when in comment
+-- TODO: don't suggest the same word
 local cmp = require'cmp'
 local luasnip = require'luasnip'
 cmp.setup({
@@ -31,13 +33,7 @@ cmp.setup({
         ['<C-u>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
         ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
         ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-        ['<BS>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                cmp.close()
-            else
-                fallback()
-            end
-        end, { "i", "s" }),
+        ['C-e'] = cmp.mapping.abort(),
         -- Like JetBrains: Enter to insert, Tab to replace
         -- TODO: Insert not working. See https://github.com/hrsh7th/nvim-cmp/issues/664
         -- Accept currently selected item. If none selected, `select` first item.
@@ -137,6 +133,7 @@ lsp_installer.on_server_ready(function(server)
     }
     -- Make Lua language server aware of built-in vim globals
     if server.name == "sumneko_lua" then
+        -- These options are passed as the lspconfig options
         opts = {
             capabilities = capabilities,
             settings = {
@@ -148,7 +145,21 @@ lsp_installer.on_server_ready(function(server)
             }
         }
     end
-    -- This setup() function is exactly the same as lspconfig's setup function.
-    -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+    -- Temporarily fix outdated OCaml NPM language server until issue resolved
+    if server.name == "ocamlls" then
+        opts = {
+            capabilities = capabilities,
+            -- Configure dune build keybind
+            on_attach = function(_, bufnr)
+                vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>mb', '<cmd>!make build<CR>', { noremap = true, silent = false})
+                vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>mt', '<cmd>!make test<CR>', { noremap = true, silent = false})
+                vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>mc', '<cmd>!make check<CR>', { noremap = true, silent = false})
+                vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>mz', '<cmd>!make zip<CR>', { noremap = true, silent = false})
+            end
+            ,
+            cmd = { "ocamllsp" },
+            root_dir = require("lspconfig.util").root_pattern("*.opam", "esy.json", "package.json", ".git", "dune"),
+        }
+    end
     server:setup(opts)
 end)
