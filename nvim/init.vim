@@ -55,6 +55,9 @@ set updatetime=750
 " Enable spell checking for documents
 autocmd FileType tex,text,markdown setlocal spell spelllang=en_us
 
+" Configure opam
+set rtp^="/home/adler/.opam/cs3110-2021fa/share/ocp-indent/vim"
+
 " ============================================================================
 " 🔑🗾 Key Maps 🔑🗾
 " ============================================================================
@@ -72,7 +75,6 @@ nnoremap <leader>C :so ~/.config/nvim/init.vim<CR>
 inoremap kj <esc>
 inoremap KJ <esc>
 vnoremap kj <esc>
-vnoremap KJ <esc>
 inoremap <esc> <nop>
 
 " Select all
@@ -106,9 +108,9 @@ noremap <silent> gx :call BetterGX()<CR>
 " Quickly insert trailing ;
 nnoremap <leader>; A;<esc>
 
-" Move visual block
-vnoremap J :m '>+1<CR>
-vnoremap K :m '<-2<CR>
+" Move visual block and reselect
+vnoremap J :m '>+1<CR>gv
+vnoremap K :m '<-2<CR>gv
 
 " Create curly braces
 inoremap {<CR> {<CR>}<esc>O
@@ -138,17 +140,7 @@ endif
 
 call plug#begin(data_dir . '/plugins')
 
-source ~/.config/nvim/plugins/editorconfig.vim
-source ~/.config/nvim/plugins/lsp.vim
-source ~/.config/nvim/plugins/lualine.vim
-source ~/.config/nvim/plugins/markdown-composer.vim
-source ~/.config/nvim/plugins/onedark.vim
-source ~/.config/nvim/plugins/quickscope.vim
-source ~/.config/nvim/plugins/telescope.vim
-source ~/.config/nvim/plugins/tmux.nvim.vim
-source ~/.config/nvim/plugins/treesitter.vim
-source ~/.config/nvim/plugins/vimspector.vim
-
+Plug 'nvim-lua/plenary.nvim'
 Plug 'ap/vim-css-color'
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'mbbill/undotree'
@@ -158,6 +150,20 @@ Plug 'sheerun/vim-polyglot'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
+
+source ~/.config/nvim/plugins/editorconfig.vim
+source ~/.config/nvim/plugins/lsp.vim
+source ~/.config/nvim/plugins/lualine.vim
+source ~/.config/nvim/plugins/markdown-composer.vim
+" source ~/.config/nvim/plugins/nvim-lint.vim " TODO
+source ~/.config/nvim/plugins/onedark.vim
+source ~/.config/nvim/plugins/quickscope.vim
+source ~/.config/nvim/plugins/telescope.vim
+source ~/.config/nvim/plugins/tmux.nvim.vim
+source ~/.config/nvim/plugins/treesitter.vim
+source ~/.config/nvim/plugins/vimspector.vim
+source ~/.config/nvim/plugins/gitsigns.vim
+source ~/.config/nvim/plugins/nullls.vim
 
 call plug#end()
 
