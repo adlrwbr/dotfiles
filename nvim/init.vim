@@ -105,15 +105,13 @@ function! BetterGX()
 endfunction
 noremap <silent> gx :call BetterGX()<CR>
 
-" Quickly insert trailing ;
+" Quickly insert trailing ; and ,
 nnoremap <leader>; A;<esc>
+nnoremap <leader>, A,<esc>
 
 " Move visual block and reselect
 vnoremap J :m '>+1<CR>gv
 vnoremap K :m '<-2<CR>gv
-
-" Create curly braces
-inoremap {<CR> {<CR>}<esc>O
 
 " Switch windows
 noremap <C-l> <C-w>l
@@ -140,6 +138,8 @@ endif
 
 call plug#begin(data_dir . '/plugins')
 
+" TODO: install a plugin to easily change my working dir
+
 Plug 'nvim-lua/plenary.nvim'
 Plug 'ap/vim-css-color'
 Plug 'kyazdani42/nvim-web-devicons'
@@ -151,19 +151,21 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 
+source ~/.config/nvim/plugins/nvim-lint.vim
+source ~/.config/nvim/plugins/autopairs.vim
+" source ~/.config/nvim/plugins/dap.vim
+source ~/.config/nvim/plugins/dracula.vim
 source ~/.config/nvim/plugins/editorconfig.vim
+source ~/.config/nvim/plugins/gitsigns.vim
 source ~/.config/nvim/plugins/lsp.vim
 source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/markdown-composer.vim
-" source ~/.config/nvim/plugins/nvim-lint.vim " TODO
-source ~/.config/nvim/plugins/onedark.vim
+" source ~/.config/nvim/plugins/nullls.vim
 source ~/.config/nvim/plugins/quickscope.vim
 source ~/.config/nvim/plugins/telescope.vim
 source ~/.config/nvim/plugins/tmux.nvim.vim
 source ~/.config/nvim/plugins/treesitter.vim
 source ~/.config/nvim/plugins/vimspector.vim
-source ~/.config/nvim/plugins/gitsigns.vim
-source ~/.config/nvim/plugins/nullls.vim
 
 call plug#end()
 
