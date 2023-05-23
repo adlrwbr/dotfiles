@@ -206,6 +206,11 @@ lvim.plugins = {
     run = "cd app && npm install",
     ft = "markdown",
   },
+  {
+    "dstein64/vim-startuptime",
+    -- lazy-load on a command
+    cmd = "StartupTime",
+  },
 }
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
