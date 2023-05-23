@@ -14,7 +14,7 @@
 set noswapfile
 set nobackup
 set undofile
-set undodir=~/.config/nvim/undodir
+set undodir=~/.config/nvim-vimscript/undodir
 
 " Spaces not tabs!
 " TODO: how much of this is necessary?
@@ -66,10 +66,10 @@ set rtp^="/home/adler/.opam/cs3110-2021fa/share/ocp-indent/vim"
 let mapleader = " "
 
 " Open config file
-nnoremap <leader>c :e ~/.config/nvim/init.vim<CR>
+nnoremap <leader>c :e ~/.config/nvim-vimscript/init.vim<CR>
 
 " Reload config file
-nnoremap <leader>C :so ~/.config/nvim/init.vim<CR>
+nnoremap <leader>C :so ~/.config/nvim-vimscript/init.vim<CR>
 
 " No more escape
 inoremap kj <esc>
@@ -151,21 +151,21 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 
-source ~/.config/nvim/plugins/nvim-lint.vim
-source ~/.config/nvim/plugins/autopairs.vim
-" source ~/.config/nvim/plugins/dap.vim
-source ~/.config/nvim/plugins/dracula.vim
-source ~/.config/nvim/plugins/editorconfig.vim
-source ~/.config/nvim/plugins/gitsigns.vim
-source ~/.config/nvim/plugins/lsp.vim
-source ~/.config/nvim/plugins/lualine.vim
-source ~/.config/nvim/plugins/markdown-composer.vim
-" source ~/.config/nvim/plugins/nullls.vim
-source ~/.config/nvim/plugins/quickscope.vim
-source ~/.config/nvim/plugins/telescope.vim
-source ~/.config/nvim/plugins/tmux.nvim.vim
-source ~/.config/nvim/plugins/treesitter.vim
-source ~/.config/nvim/plugins/vimspector.vim
+source ~/.config/nvim-vimscript/plugins/nvim-lint.vim
+source ~/.config/nvim-vimscript/plugins/autopairs.vim
+" source ~/.config/nvim-vimscript/plugins/dap.vim
+source ~/.config/nvim-vimscript/plugins/dracula.vim
+source ~/.config/nvim-vimscript/plugins/editorconfig.vim
+source ~/.config/nvim-vimscript/plugins/gitsigns.vim
+source ~/.config/nvim-vimscript/plugins/lsp.vim
+source ~/.config/nvim-vimscript/plugins/lualine.vim
+source ~/.config/nvim-vimscript/plugins/markdown-composer.vim
+" source ~/.config/nvim-vimscript/plugins/nullls.vim
+source ~/.config/nvim-vimscript/plugins/quickscope.vim
+source ~/.config/nvim-vimscript/plugins/telescope.vim
+source ~/.config/nvim-vimscript/plugins/tmux.nvim.vim
+source ~/.config/nvim-vimscript/plugins/treesitter.vim
+source ~/.config/nvim-vimscript/plugins/vimspector.vim
 
 call plug#end()
 

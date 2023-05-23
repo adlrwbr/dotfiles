@@ -10,6 +10,7 @@
 
 vim.opt.signcolumn = "yes:2" -- always show the sign column, otherwise it would shift the text each time
 vim.opt.mouse = "a" -- allow the mouse to be used in neovim. Particularly useful for resizing splits
+vim.opt.mousemoveevent = true
 vim.opt.smartcase = true
 vim.opt.smartindent = true
 vim.opt.foldmethod = "expr" -- folding set to "expr" for treesitter based folding
@@ -67,17 +68,16 @@ vim.cmd [[
     noremap <silent> gx :call BetterGX()<CR>
 ]]
 
--- enable wrap mode for certain filetypes only
-vim.api.nvim_create_autocmd("BufEnter", {
-  pattern = { "*.json", "*.jsonc", "*.md", "*.txt" },
-  command = "setlocal wrap",
-})
-
 -- Enable spell checking for documents
 vim.cmd [[
     autocmd FileType tex,text,markdown setlocal spell spelllang=en_us
 ]]
 
+-- enable wrap mode for certain filetypes only
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = { "*.json", "*.jsonc", "*.md", "*.txt" },
+  command = "setlocal wrap",
+})
 
 -------------------------------------------------------------------------------
 -- Keymap
@@ -254,7 +254,7 @@ require("lazy").setup {
   },
   {
     "max397574/better-escape.nvim",
-    config = {
+    opts = {
       mapping = { "kj" }
     }
   },
@@ -314,7 +314,7 @@ require("lazy").setup {
     dependencies = {
       -- LSP Support
       "neovim/nvim-lspconfig",
-      "williamboman/mason.nvim",
+      { "williamboman/mason.nvim", build = ":MasonUpdate" },
       "williamboman/mason-lspconfig.nvim",
 
       -- Autocompletion
@@ -334,8 +334,20 @@ require("lazy").setup {
     config = function()
       local lsp = require("lsp-zero")
       lsp.preset("recommended")
+      lsp.preset({
+        name = "recommended",
+        -- set_lsp_keymaps = true,
+        -- manage_nvim_cmp = true,
+        suggest_lsp_servers = true,
+      })
       lsp.on_attach(function(client, bufnr)
-        require("lsp-format").on_attach(client, bufnr)
+        lsp.default_keymaps({ buffer = bufnr })
+
+        -- make sure you use clients with formatting capabilities
+        -- otherwise you'll get a warning message
+        if client.supports_method('textDocument/formatting') then
+          require('lsp-format').on_attach(client)
+        end
       end)
       -- Configure lua language server for neovim
       lsp.nvim_workspace()
@@ -345,6 +357,7 @@ require("lazy").setup {
       -- Override lsp-zero cmp configs
       local cmp = require('cmp')
       cmp.setup({
+        -- TODO: enter to insert, ctrl-enter to replace
         preselect = cmp.PreselectMode.None,
         completion = {
           completeopt = 'menu, meunone, noselect',
@@ -362,13 +375,19 @@ require("lazy").setup {
         experimental = {
           ghost_text = { hl_group = "LspCodeLens" }
         },
+
         -- Try some performance tuning. Nvim-cmp could use some optimizations. If I have free time I might take a look
         -- See https://github.com/hrsh7th/nvim-cmp/issues/1009
-        performance = {
-          debounce = 500, -- time to wait to trigger completion
-          throttle = 550,
-          fetching_timeout = 80,
-        },
+        -- performance = {
+        --   debounce = 500, -- time to wait to trigger completion
+        --   throttle = 550,
+        --   fetching_timeout = 80,
+        -- },
+        -- anotherworarondforthesame issue as above with tailwind LS
+        -- sources = {
+        --   name = "nvim_lsp",
+        --   max_item_count = 200,
+        -- },
       })
     end,
     keys = {
@@ -510,7 +529,7 @@ require("lazy").setup {
       { "<C-t>", ":ToggleTerm<CR>" },
       { "<C-t>", "<C-\\><C-n>:ToggleTerm<CR>", mode = { "t" } },
     },
-    config = { direction = "float" }
+    opts = { direction = "float" }
   },
   {
     "iamcco/markdown-preview.nvim",
@@ -613,13 +632,88 @@ require("lazy").setup {
   },
   {
     "akinsho/bufferline.nvim",
-    version = "v3.*",
+    version = "*",
     dependencies = "nvim-tree/nvim-web-devicons",
-    config = true
+    opts = {
+      options = {
+        separator_style = "slant",
+        diagnostics = "nvim_lsp",
+        diagnostics_indicator = function(num, _, diagnostics, _)
+          local result = {}
+          local symbols = {
+            error = "",
+            warning = "",
+            info = ""
+          }
+          for name, count in pairs(diagnostics) do
+            if symbols[name] and count > 0 then
+              table.insert(result, symbols[name] .. " " .. count)
+            end
+          end
+          local result_str = table.concat(result, " ")
+          return #result > 0 and result_str or ""
+        end,
+        hover = {
+          enabled = true,
+          delay = 50,
+          reveal = { 'close' }
+        },
+        groups = {
+          options = {
+            toggle_hidden_on_enter = true -- when you re-enter a hidden group this options re-opens that group so the buffer is visible
+          },
+          items = { {
+            name = "Backend",
+            matcher = function(buf)
+              -- Search for a Tauri project file in the current dir or its parents
+              local tauri_file = vim.fn.findfile("tauri.conf.json", ".;")
+              if tauri_file == "" then
+                return false
+              end
+
+              -- Get the Tauri project's root directory
+              local tauri_src_dir = vim.fn.fnamemodify(tauri_file, ":h") -- parent dir
+              local project_dir = vim.fn.fnamemodify(tauri_src_dir, ":h") -- grandparent dir
+              local project_dir_escaped = project_dir:gsub("(%W)", "%%%1")
+
+              -- get the absolute path of the buffer's file
+              local buf_path = vim.fn.bufname(buf.id)
+              -- get the path to the buffile from the project root
+              local buf_path_from_project = buf_path:gsub(project_dir_escaped, "")
+
+              return buf_path_from_project:match("src%-tauri/") ~= nil
+            end,
+          },
+            {
+              name = "Frontend",
+              matcher = function(buf)
+                -- Search for a Tauri project file in the current dir or its parents
+                local tauri_file = vim.fn.findfile("tauri.conf.json", ".;")
+                if tauri_file == "" then
+                  return false
+                end
+
+                -- Get the Tauri project's root directory
+                local tauri_src_dir = vim.fn.fnamemodify(tauri_file, ":h") -- parent dir
+                local project_dir = vim.fn.fnamemodify(tauri_src_dir, ":h") -- grandparent dir
+                local project_dir_escaped = project_dir:gsub("(%W)", "%%%1")
+
+                -- get the absolute path of the buffer's file
+                local buf_path = vim.fn.bufname(buf.id)
+                -- get the path to the buffile from the project root
+                local buf_path_from_project = buf_path:gsub(project_dir_escaped, "")
+
+                return buf_path_from_project:match("src/") ~= nil and buf_path_from_project:match("src%-tauri/") == nil
+              end,
+            }
+          }
+        }
+      }
+    }
   },
   {
     "NvChad/nvim-colorizer.lua",
-    config = {
+    opts = {
       filetypes = {
         "*"; -- highlight all files but customize some others
         cmp_docs = { always_update = true }
@@ -633,6 +727,17 @@ require("lazy").setup {
 
 
 
+  {
+    "JellyApple102/easyread.nvim",
+    lazy = false,
+    filetypes = { "text" },
+    config = true
+  },
+  {
+    "nmac427/guess-indent.nvim",
+    lazy = false,
+    config = true
+  },
 
 
 
@@ -642,7 +747,7 @@ require("lazy").setup {
     "sindrets/diffview.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      { "TimUntersberger/neogit", config = { disable_commit_confirmation = true } },
+      { "TimUntersberger/neogit", opts = { disable_commit_confirmation = true } },
     },
     keys = {
       { "<leader>gdd", "<CMD>DiffviewOpen<CR>", mode = { "n", "v" }, desc = "Open" },
