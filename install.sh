@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# zsh
+ln -s /home/adler/dotfiles/.zshrc ~/.zshrc
+
 # kitty
 ln -s ~/dotfiles/kitty/kitty.conf ~/.config/kitty/kitty.conf
 ln -s ~/dotfiles/kitty/themes ~/.config/kitty/themes
