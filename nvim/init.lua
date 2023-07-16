@@ -323,6 +323,7 @@ require("lazy").setup({
 			"BurntSushi/ripgrep",
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make", lazy = false },
 		},
+		cmd = "Telescope",
 		keys = {
 			{ "<leader>sa", "<CMD>Telescope<CR>",        desc = "Anything",        mode = { "n", "v" } },
 			{ "<leader>sp", "<CMD>Telescope resume<CR>", desc = "Previous search", mode = { "n", "v" } },
@@ -342,8 +343,14 @@ require("lazy").setup({
 			local telescope = require("telescope")
 			telescope.setup({
 				defaults = {
+					wrap_results = true,
 					prompt_prefix = "🥴🔭> ",
+					file_ignore_patterns = { ".git/", "node_modules/" }
 				},
+				pickers = {
+					find_files = { hidden = true, },
+					git_files = { show_untracked = true }
+				}
 			})
 			telescope.load_extension("fzf")
 		end,
@@ -451,8 +458,8 @@ require("lazy").setup({
 			{ "<leader>lff", "<cmd>lua vim.lsp.buf.format()<cr>",                    desc = "Format with LSP" },
 			{ "<leader>li",  "<cmd>LspInfo<cr>",                                     desc = "Info" },
 			{ "<leader>lI",  "<cmd>Mason<cr>",                                       desc = "Mason Info" },
-			{ "<leader>lj",  "<cmd>lua vim.diagnostic.goto_next()<cr>",              desc = "Next Diagnostic" },
-			{ "<leader>lk",  "<cmd>lua vim.diagnostic.goto_prev()<cr>",              desc = "Prev Diagnostic" },
+			{ "]d",          "<cmd>lua vim.diagnostic.goto_next()<cr>",              desc = "Next Diagnostic" },
+			{ "[d",          "<cmd>lua vim.diagnostic.goto_prev()<cr>",              desc = "Prev Diagnostic" },
 			{ "<leader>ll",  "<cmd>lua vim.lsp.codelens.run()<cr>",                  desc = "CodeLens Action" },
 			{ "<leader>lq",  "<cmd>lua vim.diagnostic.setloclist()<cr>",             desc = "Quickfix" },
 			{ "<leader>lr",  "<cmd>lua vim.lsp.buf.rename()<cr>",                    desc = "Rename" },
@@ -472,8 +479,8 @@ require("lazy").setup({
 			local format_on_save = require("format-on-save")
 			local formatters = require("format-on-save.formatters")
 
-			-- Function to check if the buffer's project for prettier installed in `package.json`
-			local function should_use_prettier()
+			-- Check if the buffer file is in a project using prettier
+			local function prettier_project()
 				-- Search for a package.json file in the current dir or its parents
 				local package_json = vim.fn.findfile("package.json", ".;")
 				if not package_json then
@@ -489,49 +496,32 @@ require("lazy").setup({
 				return string.match(content, "prettier") ~= nil
 			end
 
-			-- A custom lazy formatter that tries to use prettier when applicable
-			local prettier_or_lsp = function()
-				if should_use_prettier() then
-					vim.notify("Formatting with Prettier")
-					-- vim.api.nvim_echo({ { "Formatting with Prettier", "None" } }, true, {})
-					return formatters.prettierd
-				else
-					vim.notify("Formatting with LSP")
-					-- vim.api.nvim_echo({ { "Formatting with LSP", "None" } }, true, {})
-					-- print("Formatting with LSP")
-					return formatters.lsp()
-				end
-			end
-
 			format_on_save.setup({
 				exclude_path_patterns = {
 					"/node_modules/",
 					".local/share/nvim/lazy",
 				},
 				formatter_by_ft = {
-					css = prettier_or_lsp,
-					html = prettier_or_lsp,
-					java = formatters.lsp,
-					javascript = prettier_or_lsp,
-					json = prettier_or_lsp,
-					lua = formatters.lsp,
-					markdown = prettier_or_lsp,
-					openscad = formatters.lsp,
+					lua = formatters.stylua,
+					rust = formatters.lsp,
+					sh = formatters.shfmt,
 					-- Concatenate formatters
 					python = {
 						formatters.remove_trailing_whitespace,
 						formatters.shell({ cmd = "tidy-imports" }),
 						formatters.black,
 					},
-					rust = formatters.lsp,
-					scad = formatters.lsp,
-					scss = formatters.lsp,
-					sh = formatters.shfmt,
-					terraform = formatters.lsp,
-					typescript = prettier_or_lsp,
-					typescriptreact = prettier_or_lsp,
-					yaml = prettier_or_lsp,
 				},
+				-- fallback formatter to use when no formatters match the current filetype
+				fallback_formatter = function()
+					if prettier_project() then
+						-- vim.notify("Formatting with Prettier")
+						return formatters.prettierd
+					else
+						-- vim.notify("Formatting with LSP")
+						return formatters.lsp()
+					end
+				end
 			})
 		end,
 	},
