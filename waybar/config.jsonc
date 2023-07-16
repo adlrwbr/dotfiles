@@ -1,0 +1,148 @@
+{
+    "layer": "top",
+    "position": "bottom",
+    "margin": "0 15 5 15", // 0 20 0 20
+    // "margin": "20 15 10 15", // 0 20 0 20
+    // "mode": "dock", // weridly this causes waybar to not take the top layer. See https://github.com/hyprwm/Hyprland/issues/899
+    "passthrough": false,
+    "gtk-layer-shell": true,
+    "modules-left": [
+        "clock",
+        "custom/weather",
+        "custom/todos",
+        "wlr/workspaces"
+    ],
+    "modules-center": [
+        "hyprland/window"
+    ],
+    "modules-right": [
+        "tray",
+        "custom/pacman",
+        "custom/language",
+        "battery",
+        "backlight",
+        "pulseaudio",
+        "pulseaudio#microphone"
+    ],
+    "hyprland/window": {
+        "format": "{}"
+    },
+    "wlr/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "on-click": "activate",
+        "format": "{icon}",
+        "persistent_workspaces": {
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": [],
+            "8": [],
+            "9": [],
+            "10": []
+        }
+    },
+    "custom/pacman": {
+        "format": " {}",
+        "interval": 7200, // every two hours
+        // "exec": "i=$(checkupdates); echo '$i' | wc -l; echo '$i' | column -t | tr '\n' '\r'", // # of updates and tooltip details
+        "exec": "i=$(checkupdates); echo \"$i\" | wc -l; echo \"$i\" | column -t | tr '\n' '\r'", // # of updates and tooltip details
+        "exec-if": "exit 0", // always run; consider advanced run conditions
+        "on-click": "kitty -e sudo pacman -Syu", // update system
+        "signal": 8
+    },
+    "custom/weather": {
+        "tooltip": true,
+        "format": "{}",
+        "interval": 30,
+        "exec": "~/.config/waybar/scripts/waybar-wttr.py",
+        "return-type": "json"
+    },
+    "custom/todos": {
+        "tooltip": true,
+        "format": "{}",
+        "interval": 30, // every 30 seconds
+        "exec": "~/.config/waybar/scripts/count_todos.sh",
+        "return-type": "text"
+    },
+    "tray": {
+        "icon-size": 13,
+        "spacing": 10
+    },
+    "clock": {
+        // "timezone": "America/New_York",
+        "format": "{: %I:%M %p   %a, %d %b}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%",
+        "format-icons": [
+            "󰃞",
+            "󰃟",
+            "󰃝",
+            "󰃠"
+        ],
+        "on-scroll-up": "brightnessctl set 1%+",
+        "on-scroll-down": "brightnessctl set 1%-",
+        "min-length": 6
+    },
+    "battery": {
+        "states": {
+            "good": 95,
+            "warning": 30,
+            "critical": 20
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-alt": "{time} {icon}",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "tooltip": false,
+        "format-muted": " Muted",
+        "on-click": "amixer set Master toggle && beep",
+        "on-scroll-up": "amixer set Master 5%+ && beep -f 5000 -l 50 -r 2",
+        "on-scroll-down": "amixer set Master 5%- && beep",
+        "scroll-step": 5,
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": [
+                "",
+                "",
+                ""
+            ]
+        }
+    },
+    "pulseaudio#microphone": {
+        "format": "{format_source}",
+        "format-source": " {volume}%",
+        "format-source-muted": " Muted",
+        "on-click": "pamixer --default-source -t",
+        "on-scroll-up": "pamixer --default-source -i 5",
+        "on-scroll-down": "pamixer --default-source -d 5",
+        "scroll-step": 5
+    }
+}

@@ -1,0 +1,47 @@
+# for whatever reason, kanshi doesn't trigger when monitors are unplugged
+#
+# [Tracking issue](https://todo.sr.ht/~emersion/kanshi/54)
+# > When unplugging, kanshi cannot find the profile, yet it can if I trigger a reload with kanshictl reload.
+#
+# I am going to work around this by setting up an event listener with hyprctl and reloading kanshi whenever there's a change
+
+profile laptop {
+	exec notify-send "display profile: laptop"
+
+	output eDP-1 enable position 0,0 scale 1
+}
+
+# dual monitor - laptop on right
+profile carbonweb {
+	exec notify-send "display profile: Carbon Web"
+
+	output "Dell Inc. D3218HN X9R5K8865NVE" mode 1920x1080 position 0,0
+	output eDP-1 mode 1920x1200 position 1920,0 scale 1.2
+
+	exec hyprctl dispatch moveworkspacetomonitor 2 "eDP-1"                                # Discord/Slack to laptop  (id 0)
+	exec hyprctl dispatch moveworkspacetomonitor 1 1                                      # mail/calendar to monitor (id 1)
+	exec hyprctl dispatch moveworkspacetomonitor 3 1                                      # browser to monitor
+}
+
+# dual monitor - laptop on right
+profile home {
+	exec notify-send "display profile: Home"
+	output "Viewteck Co., Ltd. GFT27DB 0x00000001" mode 2560x1440 position 0,0
+	output "Viewteck Co., Ltd. GFT27DB 0x00000001" mode 2560x1440 position 2560,0
+	# output eDP-1
+	output eDP-1 disable
+	# output eDP-1 mode 1920x1200 position 5120,0
+}
+
+profile home_laptop_closed {
+	exec notify-send "display profile: Home (laptop closed)"
+	# output DP-9 mode 2560x1440 position 0,0
+	# output DP-8 mode 2560x1440 position 2560,0
+	# output eDP-1 mode 1920x1200 position 5120,0
+}
+
+profile dryden {
+	exec notify-send "display profile: Dryden"
+	output "Viewteck Co., Ltd. GFT27DB 0x00000001" mode 2560x1440 position 0,0
+	output eDP-1 disable
+}

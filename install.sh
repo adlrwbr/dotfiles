@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# install delta-git: https://github.com/dandavison/delta
+
 # zsh
 ln -s /home/adler/dotfiles/.zshrc ~/.zshrc
 
@@ -20,3 +22,10 @@ ln -s ~/dotfiles/lvim/config.lua ~/.config/lvim/config.lua
 
 # touchegg
 ln -s ~/dotfiles/touchegg.conf ~/.config/touchegg/
+
+ln -s /home/adler/dotfiles/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
+ln -s /home/adler/dotfiles/hypr/hyprland.conf ~/.config/hypr/hyprland.conf
+ln -s /home/adler/dotfiles/swaylock/ ~/.config/swaylock
+ln -s /home/adler/dotfiles/waybar/ ~/.config/waybar
+ln -s /home/adler/dotfiles/wlogout/ ~/.config/wlogout
+ln -s /home/adler/dotfiles/kanshi/ ~/.config/kanshi
