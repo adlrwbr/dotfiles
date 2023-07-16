@@ -94,6 +94,20 @@ plugins=(git zsh-syntax-highlighting zsh-history-substring-search zsh-autosugges
 source $ZSH/oh-my-zsh.sh
 
 # ============================================================================
+# ⚙  fzf  ⚙
+# ============================================================================
+if command -v fzf &> /dev/null; then
+    source /usr/share/fzf/completion.zsh
+
+    # ctrl-T for files under the current dir
+    # ctrl-r for history
+    # alt-c to cd into dirs under the current dir
+    source /usr/share/fzf/key-bindings.zsh
+else
+    echo "Warning: fzf not found."
+fi
+
+# ============================================================================
 # ⚙  Options and misc config  ⚙
 # ============================================================================
 
@@ -145,12 +159,36 @@ function obs() {
     xdg-open "$file_url" >/dev/null & disown
 }
 
+# Git worktree clone
+# Sets up a clean worktree directory with all bare files hidden in .bare
+function gwtc() {
+    if [ "$#" -ne 2 ]; then
+        echo "Git worktree clone: clone a repo, set up a worktree dir, check out main"
+        echo "Usage: gwtc <repo URL> <directory name>"
+        return 1
+    fi
+    URL="$1"
+    DIRNAME="$2"
+
+    mkdir -p $DIRNAME
+    git clone --bare $URL "$DIRNAME/.bare"
+    echo "gitdir: ./.bare" > "$DIRNAME/.git"
+    cd $DIRNAME
+    git worktree add main
+    cd main
+}
+
 # custom aliases: view all with `alias`
 alias sz="source ~/.zshrc"
 alias oldvim="NVIM_APPNAME=nvim-vimscript nvim" # my previous nvim config
 alias nvchad="NVIM_APPNAME=nvchad nvim"
+alias s="kitty +kitten ssh" # automatically copy terminfo files to server: see https://sw.kovidgoyal.net/kitty/faq/#i-get-errors-about-the-terminal-being-unknown-or-opening-the-terminal-failing-or-functional-keys-like-arrow-keys-don-t-work
+alias clear="clear; echo Tsk tsk...use ctrl-l!"
+alias du="dust"
+
 
 # custom path/env vars
 export PATH="$HOME/.local/bin:$PATH"
 export MYACE_AWS_PROFILE="myace"
 export AWS_PROFILE="carbonweb"
+export AWS_PROFILE="friday"
