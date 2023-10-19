@@ -9,40 +9,40 @@
 -------------------------------------------------------------------------------
 
 vim.opt.signcolumn = "yes:2" -- always show the sign column, otherwise it would shift the text each time
-vim.opt.mouse = "a"          -- allow the mouse to be used in neovim. Particularly useful for resizing splits
+vim.opt.mouse = "a" -- allow the mouse to be used in neovim. Particularly useful for resizing splits
 vim.opt.mousemoveevent = true
 vim.opt.smartcase = true
 vim.opt.smartindent = true
-vim.opt.foldmethod = "expr"                     -- folding set to "expr" for treesitter based folding
-vim.opt.foldlevelstart = 99                     -- open file with expanded folds
+vim.opt.foldmethod = "expr" -- folding set to "expr" for treesitter based folding
+vim.opt.foldlevelstart = 99 -- open file with expanded folds
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()" -- set for treesitter based folding
-vim.opt.relativenumber = true                   -- show relative line numbers
-vim.opt.number = true                           -- show current line number
-vim.opt.splitbelow = true                       -- force all horizontal splits to go below current window
-vim.opt.splitright = true                       -- force all vertical splits to go to the right of current window
-vim.opt.wrap = false                            -- display lines as one long line
-vim.opt.ignorecase = true                       -- ignore case in search patterns
-vim.opt.scrolloff = 8                           -- minimal number of screen lines to keep above and below the cursor
-vim.opt.sidescrolloff = 8                       -- minimal number of screen columns to keep to the left and right of the cursor if wrap is `false`
-vim.opt.pumheight = 10                          -- pop up menu height
-vim.opt.iskeyword:append("-")                   -- treats words with `-` as single words
-vim.opt.clipboard = "unnamedplus"               -- allows neovim to access the system clipboard
-vim.opt.showcmd = true                          -- unset to hide (partial) command in the last line of the screen (for performance)
-vim.opt.showmode = false                        -- no more modes like -- INSERT -- on the last line. The status line plugin (lualine) replaces this.
-vim.opt.cursorline = true                       -- highlight the current line
-vim.opt.whichwrap:append("<,>,[,],h,l")         -- keys allowed to move to the previous/next line when the beginning/end of line is reached
-vim.opt.confirm = true                          -- instead of failing on :q with unsaved changed, prompt user to confirm if they want to quit without saving
+vim.opt.relativenumber = true -- show relative line numbers
+vim.opt.number = true -- show current line number
+vim.opt.splitbelow = true -- force all horizontal splits to go below current window
+vim.opt.splitright = true -- force all vertical splits to go to the right of current window
+vim.opt.wrap = false -- display lines as one long line
+vim.opt.ignorecase = true -- ignore case in search patterns
+vim.opt.scrolloff = 8 -- minimal number of screen lines to keep above and below the cursor
+vim.opt.sidescrolloff = 8 -- minimal number of screen columns to keep to the left and right of the cursor if wrap is `false`
+vim.opt.pumheight = 10 -- pop up menu height
+vim.opt.iskeyword:append("-") -- treats words with `-` as single words
+vim.opt.clipboard = "unnamedplus" -- allows neovim to access the system clipboard
+vim.opt.showcmd = true -- unset to hide (partial) command in the last line of the screen (for performance)
+vim.opt.showmode = false -- no more modes like -- INSERT -- on the last line. The status line plugin (lualine) replaces this.
+vim.opt.cursorline = true -- highlight the current line
+vim.opt.whichwrap:append("<,>,[,],h,l") -- keys allowed to move to the previous/next line when the beginning/end of line is reached
+vim.opt.confirm = true -- instead of failing on :q with unsaved changed, prompt user to confirm if they want to quit without saving
 
 -- show special characters for tabs, trailing spaces, etc.
 vim.opt.list = true
 vim.opt.listchars = "tab:▸-◂,trail:·,precedes:◁,extends:▷"
 
 vim.opt.swapfile = false -- do not create a swapfile
-vim.opt.undofile = true  -- enable persistent undo
+vim.opt.undofile = true -- enable persistent undo
 
 vim.opt.expandtab = true -- convert tabs to spaces
-vim.opt.tabstop = 2      -- insert 2 spaces for a tab
-vim.opt.shiftwidth = 2   -- the number of spaces inserted for each indentation
+vim.opt.tabstop = 2 -- insert 2 spaces for a tab
+vim.opt.shiftwidth = 2 -- the number of spaces inserted for each indentation
 
 -- Reduce time for writing to swap file and firing CursorHold when the cursor
 -- isn't moving. This autocmd is used by various plugins for highlighting
@@ -165,18 +165,18 @@ require("lazy").setup({
 		"catppuccin/nvim",
 		enabled = false,
 		name = "catppuccin",
-		lazy = false,                          -- load during startup
-		priority = 1000,                       -- load before all other start plugins
+		lazy = false, -- load during startup
+		priority = 1000, -- load before all other start plugins
 		config = function()
-			vim.opt.termguicolors = true         -- set term gui colors (most terminals support this)
+			vim.opt.termguicolors = true -- set term gui colors (most terminals support this)
 			vim.cmd.colorscheme("catppuccin-mocha") -- latte for light mode
 		end,
 	},
 	{
 		"folke/tokyonight.nvim",
 		enabled = true,
-		lazy = false,               -- load during startup
-		priority = 1000,            -- load before all other start plugins
+		lazy = false, -- load during startup
+		priority = 1000, -- load before all other start plugins
 		config = function()
 			vim.opt.termguicolors = true -- set term gui colors (most terminals support this)
 			vim.cmd.colorscheme("tokyonight-night")
@@ -184,9 +184,10 @@ require("lazy").setup({
 	},
 	{
 		"folke/which-key.nvim",
+		event = "VeryLazy",
 		config = function()
 			vim.o.timeout = true
-			vim.o.timeoutlen = 300
+			vim.o.timeoutlen = 500
 			local wk = require("which-key")
 			wk.setup({
 				-- your configuration comes here
@@ -194,10 +195,15 @@ require("lazy").setup({
 				-- refer to the configuration section below
 				plugins = {
 					marks = true, -- shows a list of your marks on ' and `
-					registers = true, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+					registers = false, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
 					spelling = {
 						enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
 						suggestions = 20, -- how many suggestions should be shown in the list?
+					},
+					presets = {
+						operators = false,
+						motions = false,
+						text_objects = false,
 					},
 				},
 			})
@@ -303,18 +309,18 @@ require("lazy").setup({
 	{
 		-- TODO: customize
 		"nvim-neo-tree/neo-tree.nvim",
-		branch = "v2.x",
+		branch = "v3.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons",
 			"MunifTanjim/nui.nvim",
 		},
 		keys = {
-			{ "<leader>e", "<CMD>Neotree toggle<CR>", desc = "Explorer", mode = { "n", "v" } },
+			{ "<leader>e", "<CMD>Neotree toggle reveal_force_cwd<CR>", desc = "Explorer", mode = { "n", "v" } },
 		},
 		config = true,
 	},
-	{ "ethanholz/nvim-lastplace",      config = true },
+	{ "ethanholz/nvim-lastplace", config = true },
 	{
 		"nvim-telescope/telescope.nvim",
 		branch = "0.1.x",
@@ -325,7 +331,7 @@ require("lazy").setup({
 		},
 		cmd = "Telescope",
 		keys = {
-			{ "<leader>sa", "<CMD>Telescope<CR>",        desc = "Anything",        mode = { "n", "v" } },
+			{ "<leader>sa", "<CMD>Telescope<CR>", desc = "Anything", mode = { "n", "v" } },
 			{ "<leader>sp", "<CMD>Telescope resume<CR>", desc = "Previous search", mode = { "n", "v" } },
 			{
 				"<leader>sf",
@@ -333,26 +339,37 @@ require("lazy").setup({
 				desc = "All files",
 				mode = { "n", "v" },
 			},
-			{ "<leader>f",  "<CMD>Telescope find_files<CR>",  desc = "Search file",       mode = { "n", "v" } },
-			{ "<leader>st", "<CMD>Telescope live_grep<CR>",   desc = "Text",              mode = { "n", "v" } },
+			{ "<leader>f", "<CMD>Telescope find_files<CR>", desc = "Search file", mode = { "n", "v" } },
+			{ "<leader>st", "<CMD>Telescope live_grep<CR>", desc = "Text", mode = { "n", "v" } },
 			{ "<leader>sw", "<CMD>Telescope grep_string<CR>", desc = "Word under cursor", mode = { "n", "v" } },
-			{ "<leader>sk", "<CMD>Telescope keymaps<CR>",     desc = "Keymap",            mode = { "n", "v" } },
-			{ "<leader>sh", "<CMD>Telescope help_tags<CR>",   desc = "Help",              mode = { "n", "v" } },
+			{ "<leader>sk", "<CMD>Telescope keymaps<CR>", desc = "Keymap", mode = { "n", "v" } },
+			{ "<leader>sh", "<CMD>Telescope help_tags<CR>", desc = "Help", mode = { "n", "v" } },
 		},
-		config = function()
+		opts = {
+			defaults = {
+				wrap_results = true,
+				prompt_prefix = "🥴🔭> ",
+				file_ignore_patterns = { ".git/", "node_modules/" },
+			},
+			pickers = {
+				find_files = { hidden = true },
+				git_files = { show_untracked = true },
+			},
+		},
+		config = function(_, opts)
 			local telescope = require("telescope")
-			telescope.setup({
-				defaults = {
-					wrap_results = true,
-					prompt_prefix = "🥴🔭> ",
-					file_ignore_patterns = { ".git/", "node_modules/" }
-				},
-				pickers = {
-					find_files = { hidden = true, },
-					git_files = { show_untracked = true }
-				}
-			})
+			telescope.setup(opts)
 			telescope.load_extension("fzf")
+		end,
+	},
+	{
+		"folke/neodev.nvim",
+		-- TODO: is this working properly?
+		opts = {},
+		config = function(self, opts)
+			require("neodev").setup({
+				library = { plugins = { "nvim-dap-ui" }, types = true },
+			})
 		end,
 	},
 	{
@@ -361,7 +378,7 @@ require("lazy").setup({
 		branch = "v1.x",
 		dependencies = {
 			-- LSP Support
-			"neovim/nvim-lspconfig",
+			{ "neovim/nvim-lspconfig", dependencies = { "folke/neodev.nvim" } },
 			"williamboman/mason-lspconfig.nvim",
 			{ "williamboman/mason.nvim", build = ":MasonUpdate", cmd = { "Mason", "MasonUpdate" } },
 
@@ -447,32 +464,32 @@ require("lazy").setup({
 			})
 		end,
 		keys = {
-			{ "gD",          ":lua vim.lsp.buf.declaration()<CR>",                   desc = "Go to declaration" },
-			{ "gd",          ":lua vim.lsp.buf.definition()<CR>",                    desc = "Go to definition" },
-			{ "gi",          ":lua vim.lsp.buf.implementation()<CR>",                desc = "Go to implementation" },
-			{ "gr",          ":lua vim.lsp.buf.references()<CR>",                    desc = "Go to references" },
-			{ "gT",          ":lua vim.lsp.buf.type_definition()<CR>",               desc = "Go to type definition" },
-			{ "<leader>la",  "<cmd>lua vim.lsp.buf.code_action()<cr>",               desc = "Code Action" },
-			{ "<leader>ld",  "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", desc = "Buffer Diagnostics" },
-			{ "<leader>lw",  "<cmd>Telescope diagnostics<cr>",                       desc = "Diagnostics" },
-			{ "<leader>lff", "<cmd>lua vim.lsp.buf.format()<cr>",                    desc = "Format with LSP" },
-			{ "<leader>li",  "<cmd>LspInfo<cr>",                                     desc = "Info" },
-			{ "<leader>lI",  "<cmd>Mason<cr>",                                       desc = "Mason Info" },
-			{ "]d",          "<cmd>lua vim.diagnostic.goto_next()<cr>",              desc = "Next Diagnostic" },
-			{ "[d",          "<cmd>lua vim.diagnostic.goto_prev()<cr>",              desc = "Prev Diagnostic" },
-			{ "<leader>ll",  "<cmd>lua vim.lsp.codelens.run()<cr>",                  desc = "CodeLens Action" },
-			{ "<leader>lq",  "<cmd>lua vim.diagnostic.setloclist()<cr>",             desc = "Quickfix" },
-			{ "<leader>lr",  "<cmd>lua vim.lsp.buf.rename()<cr>",                    desc = "Rename" },
-			{ "<leader>ls",  "<cmd>Telescope lsp_document_symbols<cr>",              desc = "Document Symbols" },
-			{ "<leader>lS",  "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",     desc = "Workspace Symbols" },
-			{ "<leader>le",  "<cmd>Telescope quickfix<cr>",                          desc = "Telescope Quickfix" },
+			{ "gD", ":lua vim.lsp.buf.declaration()<CR>", desc = "Go to declaration" },
+			{ "gd", ":lua vim.lsp.buf.definition()<CR>", desc = "Go to definition" },
+			{ "gi", ":lua vim.lsp.buf.implementation()<CR>", desc = "Go to implementation" },
+			{ "gr", ":lua vim.lsp.buf.references()<CR>", desc = "Go to references" },
+			{ "gT", ":lua vim.lsp.buf.type_definition()<CR>", desc = "Go to type definition" },
+			{ "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code Action" },
+			{ "<leader>ld", "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", desc = "Buffer Diagnostics" },
+			{ "<leader>lw", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
+			{ "<leader>lff", "<cmd>lua vim.lsp.buf.format()<cr>", desc = "Format with LSP" },
+			{ "<leader>li", "<cmd>LspInfo<cr>", desc = "Info" },
+			{ "<leader>lI", "<cmd>Mason<cr>", desc = "Mason Info" },
+			{ "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
+			{ "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
+			{ "<leader>ll", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
+			{ "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<cr>", desc = "Quickfix" },
+			{ "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" },
+			{ "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols" },
+			{ "<leader>lS", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace Symbols" },
+			{ "<leader>le", "<cmd>Telescope quickfix<cr>", desc = "Telescope Quickfix" },
 		},
 	},
 	{
 		"elentok/format-on-save.nvim",
 		keys = {
 			{ "<leader>lfd", "<cmd>FormatOff<cr>", desc = "Disable format on save" },
-			{ "<leader>lfe", "<cmd>FormatOn<cr>",  desc = "Enable format on save" },
+			{ "<leader>lfe", "<cmd>FormatOn<cr>", desc = "Enable format on save" },
 		},
 		lazy = false,
 		config = function()
@@ -501,6 +518,8 @@ require("lazy").setup({
 					"/node_modules/",
 					".local/share/nvim/lazy",
 				},
+				-- disable annoying vim.notify() error notification
+				error_notifier = nil,
 				formatter_by_ft = {
 					lua = formatters.stylua,
 					rust = formatters.lsp,
@@ -508,7 +527,7 @@ require("lazy").setup({
 					-- Concatenate formatters
 					python = {
 						formatters.remove_trailing_whitespace,
-						formatters.shell({ cmd = "tidy-imports" }),
+						-- formatters.shell({ cmd = "tidy-imports" }),
 						formatters.black,
 					},
 				},
@@ -521,7 +540,7 @@ require("lazy").setup({
 						-- vim.notify("Formatting with LSP")
 						return formatters.lsp()
 					end
-				end
+				end,
 			})
 		end,
 	},
@@ -530,15 +549,59 @@ require("lazy").setup({
 		build = ":TSUpdate",
 		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
-			"windwp/nvim-ts-autotag",
-			"HiPhish/nvim-ts-rainbow2",
+			{
+				"HiPhish/rainbow-delimiters.nvim",
+				lazy = false,
+				enabled = false,
+				opts = function()
+					return {
+						-- Highlight the entire buffer at once if it's a small buffer
+						strategy = {
+							[""] = function()
+								-- only enable rainbow delimiters in small files
+								local buf = vim.api.nvim_get_current_buf()
+								local line_count = vim.api.nvim_buf_line_count(buf)
+								if line_count < 3000 then
+									return require("rainbow-delimiters").strategy.global
+								end
+							end,
+						},
+						-- Which query to use for finding delimiters based on ft
+						query = {
+							[""] = "rainbow-delimiters",
+							-- tsx = "rainbow-parens",
+							tsx = "rainbow-delimiters-react",
+						},
+					}
+				end,
+				config = function(_, opts)
+					require("rainbow-delimiters.setup")(opts)
+				end,
+			},
 			"nvim-treesitter/playground",
 			"JoosepAlviste/nvim-ts-context-commentstring",
+			{
+				"nvim-treesitter/nvim-treesitter-context",
+				keys = {
+					{ "<leader>tsc", "<cmd>TSContextToggle<cr>", desc = "Toggle TS Context" },
+					{
+						"[c",
+						"<cmd>lua require('treesitter-context').go_to_context()<cr>",
+						desc = "Go to context",
+						mode = { "n" },
+					},
+				},
+				cmd = { "TSContextEnable", "TSContextDisable", "TSContextToggle" },
+				opts = {
+					max_lines = 3,
+				},
+				config = true,
+			},
 		},
 		keys = {
 			{ "<leader>ts", "<CMD>TSPlaygroundToggle<CR>", desc = "Playground", mode = { "n", "v" } },
-			{ "<c-space>",  desc = "Increment selection" },
-			{ "<bs>",       desc = "Decrement selection",  mode = { "x" } },
+			{ "<c-space>", desc = "Increment selection" },
+			{ "<bs>", desc = "Decrement selection", mode = { "x" } },
 		},
 		config = function()
 			require("nvim-treesitter.configs").setup({
@@ -551,8 +614,9 @@ require("lazy").setup({
 
 				highlight = { enable = true },
 				indent = { enable = true },
-				autotag = { enable = true },
-				context_commentstring = { enable = true },
+				-- disable the default autocmd via the context_commentstring Integrations guide:
+				-- https://github.com/JoosepAlviste/nvim-ts-context-commentstring/wiki/Integrations#nvim-comment
+				context_commentstring = { enable = true, enable_autocmd = false },
 
 				incremental_selection = {
 					enable = true,
@@ -564,20 +628,10 @@ require("lazy").setup({
 					},
 				},
 
-				rainbow = {
-					enable = true,
-					-- Which query to use for finding delimiters
-					query = "rainbow-parens",
-					-- Highlight the entire buffer all at once
-					strategy = require("ts-rainbow.strategy.global"),
-					-- Do not enable for files with more than n lines
-					max_file_lines = 3000,
-				},
-
 				playground = {
 					enable = true,
 					disable = {},
-					updatetime = 25,    -- Debounced time for highlighting nodes in the playground from source code
+					updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
 					persist_queries = false, -- Whether the query persists across vim sessions
 					keybindings = {
 						toggle_query_editor = "o",
@@ -596,14 +650,120 @@ require("lazy").setup({
 		end,
 	},
 	{
+		"mfussenegger/nvim-dap",
+		config = function()
+			local dap = require("dap")
+			dap.configurations.python = {
+				{
+					type = "python",
+					request = "launch",
+					name = "Launch file",
+					program = "${file}",
+					pythonPath = function()
+						return "/usr/bin/python"
+					end,
+				},
+			}
+			-- Automatically read VSCode launch.json
+			require("dap.ext.vscode").load_launchjs(nil, {
+				["pwa-node"] = {
+					"javascript",
+					"typescript",
+				},
+				["node"] = {
+					"javascript",
+					"typescript",
+				},
+			})
+		end,
+	},
+	{
+		"rcarriga/nvim-dap-ui",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+		},
+		config = function()
+			local dap, dapui = require("dap"), require("dapui")
+			dap.listeners.after.event_initialized["dapui_config"] = function()
+				dapui.open()
+			end
+			dap.listeners.before.event_terminated["dapui_config"] = function()
+				dapui.close()
+			end
+			dap.listeners.before.event_exited["dapui_config"] = function()
+				dapui.close()
+			end
+		end,
+	},
+	{
+		"mxsdev/nvim-dap-vscode-js",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+			"rcarriga/nvim-dap-ui",
+			{
+				"microsoft/vscode-js-debug",
+				build = "npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out",
+			},
+		},
+		ft = { "javascript", "typescript" },
+		config = function()
+			local _, lazy_config = pcall(require, "lazy.core.config")
+			local debugger_path = lazy_config.defaults.root .. "/" .. "vscode-js-debug"
+			require("dap-vscode-js").setup({
+				-- node_path = "node", -- Path of node executable. Defaults to $NODE_PATH, and then "node"
+				debugger_path = debugger_path,
+				-- debugger_cmd = { "js-debug-adapter" }, -- Command to use to launch the debug server. Takes precedence over `node_path` and `debugger_path`.
+				adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" }, -- which adapters to register in nvim-dap
+				-- log_file_path = "(stdpath cache)/dap_vscode_js.log" -- Path for file logging
+				-- log_file_level = false -- Logging level for output to file. Set to false to disable file logging.
+				-- log_console_level = vim.log.levels.ERROR -- Logging level for output to console. Set to false to disable console output.
+			})
+			for _, language in ipairs({ "typescript", "javascript" }) do
+				require("dap").configurations[language] = {
+					{
+						address = "0.0.0.0",
+						localRoot = "${workspaceFolder}",
+						name = "Attach to Docker",
+						port = 9229,
+						remoteRoot = "/app",
+						request = "attach",
+						skipFiles = { "<node_internals>/**" },
+						type = "pwa-node",
+						restart = "true",
+					},
+					{
+						type = "server",
+						host = "0.0.0.0",
+						port = "9229",
+					},
+				}
+			end
+		end,
+	},
+	{
 		"windwp/nvim-autopairs",
+		event = "InsertEnter",
 		config = function()
 			-- If you want insert `(` after select function or method item
 			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 			local cmp = require("cmp")
 			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-			require("nvim-autopairs").setup({})
+
+			local Rule = require("nvim-autopairs.rule")
+			local npairs = require("nvim-autopairs")
+			require("nvim-autopairs").setup()
+
+			npairs.add_rules({
+				Rule('"""', '"""', { "graphql" }),
+			})
 		end,
+	},
+	{
+		"windwp/nvim-ts-autotag",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+		},
+		config = true,
 	},
 	{
 		"kylechui/nvim-surround",
@@ -616,19 +776,23 @@ require("lazy").setup({
 	{
 		"terrortylor/nvim-comment",
 		keys = {
-			{ "<leader>/", "<CMD>CommentToggle<CR>",         desc = "Comment Line",  mode = { "n" } },
+			{ "<leader>/", "<CMD>CommentToggle<CR>", desc = "Comment Line", mode = { "n" } },
 			{ "<leader>/", ":'<,'>CommentToggle<CR>gv<esc>", desc = "Comment Block", mode = { "v" } },
 		},
 		config = function()
-			require("nvim_comment").setup()
+			require("nvim_comment").setup({
+				hook = function()
+					require("ts_context_commentstring.internal").update_commentstring()
+				end,
+			})
 		end,
 	},
 	{
 		"fedepujol/move.nvim",
 		keys = {
-			{ "<A-j>", ":MoveLine(1)<CR>",   mode = { "n" } },
-			{ "<A-k>", ":MoveLine(-1)<CR>",  mode = { "n" } },
-			{ "<A-j>", ":MoveBlock(1)<CR>",  mode = { "v" } },
+			{ "<A-j>", ":MoveLine(1)<CR>", mode = { "n" } },
+			{ "<A-k>", ":MoveLine(-1)<CR>", mode = { "n" } },
+			{ "<A-j>", ":MoveBlock(1)<CR>", mode = { "v" } },
 			{ "<A-k>", ":MoveBlock(-1)<CR>", mode = { "v" } },
 		},
 	},
@@ -744,16 +908,17 @@ require("lazy").setup({
 		dependencies = {
 			"folke/twilight.nvim",
 		},
-		config = function()
-			require("zen-mode").setup({
-				plugins = {
-					twilight = { enabled = true },      -- enable to start Twilight when zen mode opens
-					gitsigns = { enabled = false },     -- disables git signs
-					tmux = { enabled = true },          -- disables the tmux statusline
-					kitty = { enabled = true, font = "+4" }, -- increase font size
-				},
-			})
-		end,
+		-- if 'config' is omitted, 'opts' gets passed into require(plugin).setup()
+		-- config may be a function that returns a table
+		-- if opts is set then it gets passed into config = function(_, opts) so you can use the opts later
+		opts = {
+			plugins = {
+				twilight = { enabled = false }, -- highlight only active portions of code
+				gitsigns = { enabled = false }, -- disables git signs
+				tmux = { enabled = true }, -- disables the tmux statusline
+				kitty = { enabled = true, font = "+4" }, -- increase font size
+			},
+		},
 		keys = {
 			{ "<leader>z", "<CMD>ZenMode<CR>", desc = "Zen mode" },
 		},
@@ -854,6 +1019,32 @@ require("lazy").setup({
 	},
 	{ "christoomey/vim-tmux-navigator" },
 	{
+		"folke/flash.nvim",
+		event = "VeryLazy",
+		---@type Flash.Config
+		opts = {},
+		-- stylua: ignore
+		keys = {
+			{ "s", mode = { "n", "x", "o" }, function() require("flash").jump() end,       desc = "Flash" },
+			{ "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+			{ "r", mode = "o",               function() require("flash").remote() end,     desc = "Remote Flash" },
+			{
+				"R",
+				mode = { "o", "x" },
+				function() require("flash").treesitter_search() end,
+				desc =
+				"Treesitter Search"
+			},
+			{
+				"<c-s>",
+				mode = { "c" },
+				function() require("flash").toggle() end,
+				desc =
+				"Toggle Flash Search"
+			},
+		},
+	},
+	{
 		"j-hui/fidget.nvim",
 		tag = "legacy",
 		config = true,
@@ -866,7 +1057,6 @@ require("lazy").setup({
 			-- show_current_context_start = true
 		},
 	},
-
 	{
 		"JellyApple102/easyread.nvim",
 		lazy = false,
@@ -878,7 +1068,6 @@ require("lazy").setup({
 		lazy = false,
 		config = true,
 	},
-
 	-- TODO: setup
 	{
 		"sindrets/diffview.nvim",
@@ -887,7 +1076,7 @@ require("lazy").setup({
 			{ "TimUntersberger/neogit", opts = { disable_commit_confirmation = true } },
 		},
 		keys = {
-			{ "<leader>gdd", "<CMD>DiffviewOpen<CR>",  mode = { "n", "v" }, desc = "Open" },
+			{ "<leader>gdd", "<CMD>DiffviewOpen<CR>", mode = { "n", "v" }, desc = "Open" },
 			{ "<leader>gdc", "<CMD>DiffviewClose<CR>", mode = { "n", "v" }, desc = "Close" },
 		},
 		config = true,
