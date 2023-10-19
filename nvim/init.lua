@@ -513,13 +513,23 @@ require("lazy").setup({
 				return string.match(content, "prettier") ~= nil
 			end
 
+			---@type ErrorNotifier test
+			local error_notifier = {
+				show = function(opts)
+					-- use opts.title and opts.body
+				end,
+				hide = function()
+					-- hide the error when it's been resolved
+				end,
+			}
+
 			format_on_save.setup({
 				exclude_path_patterns = {
 					"/node_modules/",
 					".local/share/nvim/lazy",
 				},
 				-- disable annoying vim.notify() error notification
-				error_notifier = nil,
+				error_notifier = error_notifier,
 				formatter_by_ft = {
 					lua = formatters.stylua,
 					rust = formatters.lsp,
