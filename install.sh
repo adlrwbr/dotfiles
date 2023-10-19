@@ -27,5 +27,4 @@ ln -s /home/adler/dotfiles/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
 ln -s /home/adler/dotfiles/hypr/hyprland.conf ~/.config/hypr/hyprland.conf
 ln -s /home/adler/dotfiles/swaylock/ ~/.config/swaylock
 ln -s /home/adler/dotfiles/waybar/ ~/.config/waybar
-ln -s /home/adler/dotfiles/wlogout/ ~/.config/wlogout
 ln -s /home/adler/dotfiles/kanshi/ ~/.config/kanshi

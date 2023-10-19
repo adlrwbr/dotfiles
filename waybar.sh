@@ -15,6 +15,7 @@ if [ ! -d "$dir_path" ]; then
   exit 1
 fi
 
+# pkill waybar && sleep 1
 rm -rf ~/.config/waybar
 ln -s $dir_path ~/.config/waybar
 waybar

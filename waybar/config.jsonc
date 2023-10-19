@@ -10,6 +10,8 @@
         "clock",
         "custom/weather",
         "custom/todos",
+        // TODO: (official) Waybar now supports hyprland/workspaces
+        // TODO: replace
         "wlr/workspaces"
     ],
     "modules-center": [
@@ -18,7 +20,8 @@
     "modules-right": [
         "tray",
         "custom/pacman",
-        "custom/language",
+        "custom/kblayout",
+        "hyprland/language",
         "battery",
         "backlight",
         "pulseaudio",
@@ -26,6 +29,10 @@
     ],
     "hyprland/window": {
         "format": "{}"
+    },
+    "hyprland/language": {
+        "format": "{shortDescription}"
+        // "on-click": ""
     },
     "wlr/workspaces": {
         "disable-scroll": true,

@@ -1,6 +1,6 @@
 #!/bin/bash
 # count the todos in a logseq graph
-GRAPHDIR=~/logseqtest/
+GRAPHDIR=~/notes/
 TODOS=$(rg -- "- TODO" $GRAPHDIR/assets/ $GRAPHDIR/journals/ $GRAPHDIR/pages/ | grep -v '^\s*$' | sed -e 's/^.*TODO /- /')
 
 echo "📝 $(echo "$TODOS" | wc -l)"

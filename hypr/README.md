@@ -2,8 +2,16 @@
 
 ## Dependencies
 ```
-yay -S dunst pipewire wireplumber xdg-desktop-portal-hyprland-git grim slurp waybar-hyprland-git eww-wayland hyprpaper swaylock-effects-git swayidle wl-clipboard grimblast-git polkit-gnome gnome-keyring libsecret brightnessctl pavucontrol wlogout nm-applet kanshi hyprpicker
+yay -S swaync pipewire wireplumber xdg-desktop-portal-hyprland-git grim slurp waybar-hyprland-git eww-wayland swaylock-effects-git swayidle wl-clipboard grimblast-git polkit-gnome gnome-keyring libsecret brightnessctl pavucontrol nm-applet kanshi hyprpicker swaybg wallutils
 ```
+
+## rofi applets
+
+`yay -S rofi-wayland rofimoji wtype`
+
+My theme is based on those provided by
+https://github.com/adi1090x/rofi
+
 
 ## firefox vim
 `yay -S firefox-tridactyl firefox-tridactyl-native`
