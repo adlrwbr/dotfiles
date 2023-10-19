@@ -122,7 +122,7 @@ setopt appendhistory                                            # Immediately ap
 setopt hist_ignore_dups                                         # ignore duplicated commands history list
 setopt autocd                                                   # if only directory path is entered, cd there.
 setopt inc_append_history                                       # save commands are added to the history immediately, otherwise only when shell exits.
-setopt histignorespace                                          # Don't save commands that start with space
+setopt hist_ignore_space                                          # Don't save commands that start with space
 setopt hist_expire_dups_first                                   # delete duplicates first when HISTFILE size exceeds HISTSIZE
 
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' # Case insensitive tab completion
@@ -178,6 +178,9 @@ function gwtc() {
     cd main
 }
 
+# 1Password CLI
+source ~/.config/op/plugins.sh
+
 # custom aliases: view all with `alias`
 alias sz="source ~/.zshrc"
 alias oldvim="NVIM_APPNAME=nvim-vimscript nvim" # my previous nvim config
@@ -185,10 +188,13 @@ alias nvchad="NVIM_APPNAME=nvchad nvim"
 alias s="kitty +kitten ssh" # automatically copy terminfo files to server: see https://sw.kovidgoyal.net/kitty/faq/#i-get-errors-about-the-terminal-being-unknown-or-opening-the-terminal-failing-or-functional-keys-like-arrow-keys-don-t-work
 alias clear="clear; echo Tsk tsk...use ctrl-l!"
 alias du="dust"
-
+alias psql=" psql" # don't append psql commands (which contain sensitive info) to zsh_history
+alias gs="git status"
 
 # custom path/env vars
 export PATH="$HOME/.local/bin:$PATH"
+export TERMINAL="kitty" # rofi uses this var to launch scripts / ssh
 export MYACE_AWS_PROFILE="myace"
 export AWS_PROFILE="carbonweb"
 export AWS_PROFILE="friday"
+export AWS_PROFILE="herme"
