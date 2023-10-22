@@ -49,9 +49,9 @@ vim.opt.shiftwidth = 2 -- the number of spaces inserted for each indentation
 vim.opt.updatetime = 300 -- faster completion (4000ms default)
 
 -- vim.api.nvim_set_var("matchparen_timeout", 2)
-vim.o.noshowmatch = true
-vim.g.loaded_matchparen = false
-vim.g.matchparen_timeout = 2
+-- vim.o.noshowmatch = true
+vim.g.loaded_matchparen = 1
+-- vim.g.matchparen_timeout = 2
 
 -- Configure opam
 -- set rtp^="/home/adler/.opam/cs3110-2021fa/share/ocp-indent/vim"
@@ -561,6 +561,7 @@ require("lazy").setup({
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
+		enabled = true,
 		build = ":TSUpdate",
 		event = { "BufReadPost", "BufNewFile" },
 		dependencies = {
@@ -627,7 +628,17 @@ require("lazy").setup({
 				-- Automatically install missing parsers when entering buffer
 				auto_install = true,
 
-				highlight = { enable = true },
+				highlight = {
+					enable = true,
+					-- disable slow treesitter highlight for large files
+					disable = function(lang, buf)
+						local max_filesize = 20 * 1024 -- 20 KB
+						local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+						if ok and stats and stats.size > max_filesize then
+							return true
+						end
+					end,
+				},
 				indent = { enable = true },
 				-- disable the default autocmd via the context_commentstring Integrations guide:
 				-- https://github.com/JoosepAlviste/nvim-ts-context-commentstring/wiki/Integrations#nvim-comment
