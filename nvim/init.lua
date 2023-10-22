@@ -48,6 +48,11 @@ vim.opt.shiftwidth = 2 -- the number of spaces inserted for each indentation
 -- isn't moving. This autocmd is used by various plugins for highlighting
 vim.opt.updatetime = 300 -- faster completion (4000ms default)
 
+-- vim.api.nvim_set_var("matchparen_timeout", 2)
+vim.o.noshowmatch = true
+vim.g.loaded_matchparen = false
+vim.g.matchparen_timeout = 2
+
 -- Configure opam
 -- set rtp^="/home/adler/.opam/cs3110-2021fa/share/ocp-indent/vim"
 
@@ -1057,26 +1062,36 @@ require("lazy").setup({
 	{
 		"j-hui/fidget.nvim",
 		tag = "legacy",
+		event = "LspAttach",
 		config = true,
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		enabled = false,
-		config = {
+		opts = {
 			-- show_current_context = true,
 			-- show_current_context_start = true
 		},
 	},
 	{
 		"JellyApple102/easyread.nvim",
-		lazy = false,
-		filetypes = { "text" },
+		ft = "text",
 		config = true,
 	},
 	{
 		"nmac427/guess-indent.nvim",
 		lazy = false,
 		config = true,
+	},
+	{
+		"LunarVim/bigfile.nvim",
+		lazy = false,
+		config = true,
+	},
+	{
+		"stevearc/dressing.nvim",
+		opts = {},
+		event = "VeryLazy",
 	},
 	-- TODO: setup
 	{
