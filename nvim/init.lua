@@ -248,6 +248,7 @@ require("lazy").setup({
 					name = "Buffers",
 					j = { "<cmd>BufferLinePick<cr>", "Jump" },
 					f = { "<cmd>Telescope buffers previewer=false<cr>", "Find" },
+					c = { "<cmd>bdelete<cr>", "Close" },
 					-- b = { "<cmd>BufferLineCyclePrev<cr>", "Previous" },
 					n = { "<cmd>BufferLineCycleNext<cr>", "Next" },
 					W = { "<cmd>noautocmd w<cr>", "Save without formatting (noautocmd)" },
@@ -380,22 +381,25 @@ require("lazy").setup({
 	{
 		"VonHeikemen/lsp-zero.nvim",
 		event = { "BufReadPost", "BufNewFile" },
-		branch = "v1.x",
+		branch = "v3.x",
 		dependencies = {
 			-- LSP Support
 			{ "neovim/nvim-lspconfig", dependencies = { "folke/neodev.nvim" } },
-			"williamboman/mason-lspconfig.nvim",
+
+			-- Manage LSP Servers from neovim
 			{ "williamboman/mason.nvim", build = ":MasonUpdate", cmd = { "Mason", "MasonUpdate" } },
+			"williamboman/mason-lspconfig.nvim",
 
 			-- Setup null-ls
 			"jay-babu/mason-null-ls.nvim",
-			"jose-elias-alvarez/null-ls.nvim",
+			"nvimtools/none-ls.nvim", -- an actively maintained fork of null-ls
 
 			-- Autocompletion
 			"hrsh7th/nvim-cmp",
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-cmdline",
 			"saadparwaiz1/cmp_luasnip",
 			"hrsh7th/cmp-nvim-lua",
 
@@ -417,7 +421,7 @@ require("lazy").setup({
 			null_ls.setup({
 				sources = {
 					-- Replace these with the tools you want to install
-					null_ls.builtins.diagnostics.eslint,
+					null_ls.builtins.diagnostics.eslint_d,
 				},
 			})
 
@@ -432,13 +436,14 @@ require("lazy").setup({
 				automatic_setup = true,
 			})
 
-			-- Override lsp-zero cmp configs
+			-- Extend lsp-zero cmp configs
 			local cmp = require("cmp")
+			local cmp_action = require("lsp-zero").cmp_action()
 			cmp.setup({
 				-- TODO: enter to insert, ctrl-enter to replace
 				preselect = cmp.PreselectMode.None,
 				completion = {
-					completeopt = "menu, meunone, noselect",
+					completeopt = "menu, meunone, noselect, preview",
 					-- Override trigger characters to ignore closing tag: see https://github.com/hrsh7th/nvim-cmp/issues/1055
 					get_trigger_characters = function(trigger_characters)
 						local new_trigger_characters = {}
@@ -453,35 +458,38 @@ require("lazy").setup({
 				experimental = {
 					ghost_text = { hl_group = "LspCodeLens" },
 				},
-
-				-- Try some performance tuning. Nvim-cmp could use some optimizations. If I have free time I might take a look
-				-- See https://github.com/hrsh7th/nvim-cmp/issues/1009
-				-- performance = {
-				--   debounce = 500, -- time to wait to trigger completion
-				--   throttle = 550,
-				--   fetching_timeout = 80,
-				-- },
-				-- anotherworarondforthesame issue as above with tailwind LS
-				-- sources = {
-				--   name = "nvim_lsp",
-				--   max_item_count = 200,
-				-- },
+				-- extend default mappings
+				mapping = cmp.mapping.preset.insert({
+					-- `Enter` key to confirm completion
+					["<CR>"] = cmp.mapping.confirm({ select = false }),
+					-- Ctrl+Space to trigger completion menu
+					["<C-Space>"] = cmp.mapping.complete(),
+					-- Navigate between snippet placeholder
+					["<A-l>"] = cmp_action.luasnip_jump_forward(),
+					["<A-h>"] = cmp_action.luasnip_jump_backward(),
+					-- Scroll up and down in the completion documentation
+					["<C-u>"] = cmp.mapping.scroll_docs(-4),
+					["<C-d>"] = cmp.mapping.scroll_docs(4),
+				}),
 			})
 		end,
 		keys = {
-			{ "gD", ":lua vim.lsp.buf.declaration()<CR>", desc = "Go to declaration" },
-			{ "gd", ":lua vim.lsp.buf.definition()<CR>", desc = "Go to definition" },
-			{ "gi", ":lua vim.lsp.buf.implementation()<CR>", desc = "Go to implementation" },
-			{ "gr", ":lua vim.lsp.buf.references()<CR>", desc = "Go to references" },
-			{ "gT", ":lua vim.lsp.buf.type_definition()<CR>", desc = "Go to type definition" },
+			{ "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
+			{ "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
+
+			{ "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", desc = "Go to definition" },
+			{ "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", desc = "Go to declaration" },
+			{ "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", desc = "Go to implementation" },
+			{ "gr", "<cmd>lua vim.lsp.buf.references()<CR>", desc = "Go to references" },
+			{ "gT", "<cmd>lua vim.lsp.buf.type_definition()<CR>", desc = "Go to type definition" },
+			{ "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", desc = "Get signature help" },
+			{ "<C-s>", "<cmd>lua vim.lsp.buf.signature_help()<cr>", mode = { "i" }, desc = "Get signature help" },
 			{ "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code Action" },
 			{ "<leader>ld", "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", desc = "Buffer Diagnostics" },
 			{ "<leader>lw", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
 			{ "<leader>lff", "<cmd>lua vim.lsp.buf.format()<cr>", desc = "Format with LSP" },
 			{ "<leader>li", "<cmd>LspInfo<cr>", desc = "Info" },
 			{ "<leader>lI", "<cmd>Mason<cr>", desc = "Mason Info" },
-			{ "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
-			{ "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
 			{ "<leader>ll", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
 			{ "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<cr>", desc = "Quickfix" },
 			{ "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" },
