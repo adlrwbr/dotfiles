@@ -97,6 +97,8 @@ source $ZSH/oh-my-zsh.sh
 # ⚙  fzf  ⚙
 # ============================================================================
 if command -v fzf &> /dev/null; then
+    export FZF_ALT_C_COMMAND='fd --type=directory --hidden --follow --exclude={.git,.bare,.idea,.vscode,__pycache__,.conda,site-packages,.sass-cache,.cargo,deps,go,Pods,.mozilla,.npm,pnpm,.local,.cache,node_modules,build,dist,tmp}'
+
     source /usr/share/fzf/completion.zsh
 
     # ctrl-T for files under the current dir
