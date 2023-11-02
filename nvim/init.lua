@@ -52,6 +52,7 @@ vim.opt.updatetime = 300 -- faster completion (4000ms default)
 -- vim.o.noshowmatch = true
 vim.g.loaded_matchparen = 1
 -- vim.g.matchparen_timeout = 2
+vim.api.nvim_set_var("cmdheight", 1)
 
 -- Configure opam
 -- set rtp^="/home/adler/.opam/cs3110-2021fa/share/ocp-indent/vim"
@@ -112,6 +113,9 @@ vim.keymap.set("n", "<C-k>", "<C-w>k", opts)
 
 -- Put-replace without copying
 vim.keymap.set("v", "<leader>p", '"_dp', opts)
+
+-- By default C-d is "De-Tab" and C-t is "Tab". I prefer shift-tab
+vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
 
 -------------------------------------------------------------------------------
 -- A script that automatically closes untouched buffers
@@ -388,10 +392,13 @@ require("lazy").setup({
 
 			-- Manage LSP Servers from neovim
 			{ "williamboman/mason.nvim", build = ":MasonUpdate", cmd = { "Mason", "MasonUpdate" } },
+
+			-- Automatically set up LSP servers installed via Mason
 			"williamboman/mason-lspconfig.nvim",
 
-			-- Setup null-ls
+			-- Automatically set up NullLS sources installed via Mason
 			"jay-babu/mason-null-ls.nvim",
+			-- Set up null-ls
 			"nvimtools/none-ls.nvim", -- an actively maintained fork of null-ls
 
 			-- Autocompletion
@@ -408,32 +415,47 @@ require("lazy").setup({
 			"rafamadriz/friendly-snippets",
 		},
 		config = function()
-			local lsp = require("lsp-zero")
-			lsp.preset({ name = "recommended" })
+			local lsp_zero = require("lsp-zero")
+			lsp_zero.preset({ name = "recommended" })
 
 			-- Configure lua language server for neovim
-			lsp.nvim_workspace()
-			lsp.setup()
+			require("lspconfig").lua_ls.setup({
+				settings = {
+					Lua = {
+						diagnostics = {
+							-- force the language server to recognize the `vim` global
+							globals = { "vim" },
+						},
+						workspace = {
+							-- Disbale LuaLS prompt for standalone files: https://github.com/LunarVim/LunarVim/issues/4049#issuecomment-1634539474
+							checkThirdParty = false,
+						},
+					},
+				},
+			})
 			vim.diagnostic.config({ virtual_text = true })
 
-			-- Setup null-ls
-			local null_ls = require("null-ls")
-			null_ls.setup({
-				sources = {
-					-- Replace these with the tools you want to install
-					null_ls.builtins.diagnostics.eslint_d,
+			require("mason").setup({})
+			require("mason-lspconfig").setup({
+				ensure_installed = {},
+				handlers = {
+					lsp_zero.default_setup,
 				},
 			})
 
+			-- Setup null-ls
+			local null_ls = require("null-ls")
+			null_ls.setup()
+
+			-- Automatically set up null_ls sources
 			-- See mason-null-ls.nvim's documentation for more details:
 			-- https://github.com/jay-babu/mason-null-ls.nvim#setup
 			require("mason-null-ls").setup({
-				-- ensure_installed = { 'stylua', 'eslint', 'prettierd' },
-				ensure_installed = nil,
+				ensure_installed = nil, -- primary source of truth is null_ls
 				automatic_installation = true,
+				-- an empty handlers will cause all sources from Mason to be automatically registered in null-ls
 				-- removes the need to configure null-ls for supported sources
-				-- sources found in mason will automatically be setup for null-ls
-				automatic_setup = true,
+				handlers = {},
 			})
 
 			-- Extend lsp-zero cmp configs
@@ -476,6 +498,8 @@ require("lazy").setup({
 		keys = {
 			{ "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
 			{ "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
+
+			{ "K", "<cmd>lua vim.lsp.buf.hover()<cr>", desc = "Prev Diagnostic" },
 
 			{ "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", desc = "Go to definition" },
 			{ "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", desc = "Go to declaration" },
@@ -832,11 +856,13 @@ require("lazy").setup({
 	},
 	{
 		"akinsho/toggleterm.nvim",
+		version = "*",
 		keys = {
-			{ "<C-t>", ":ToggleTerm<CR>" },
-			{ "<C-t>", "<C-\\><C-n>:ToggleTerm<CR>", mode = { "t" } },
+			{ "<C-t>", desc = "Toggle Term" },
+			{ "<C-S-t>", "<cmd>ToggleTermSendCurrentLine<cr>", desc = "Send current line to Terminal", mode = "n" },
+			{ "<C-S-t>", "<cmd>ToggleTermSendVisualSelection<cr>", desc = "Send selection to Terminal", mode = "v" },
 		},
-		opts = { direction = "float" },
+		opts = { direction = "float", open_mapping = [[<C-t>]] },
 	},
 	{
 		"iamcco/markdown-preview.nvim",
@@ -1086,7 +1112,8 @@ require("lazy").setup({
 	},
 	{
 		"lukas-reineke/indent-blankline.nvim",
-		enabled = false,
+		enabled = true,
+		main = "ibl",
 		opts = {
 			-- show_current_context = true,
 			-- show_current_context_start = true
