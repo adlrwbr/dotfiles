@@ -203,7 +203,7 @@ require("lazy").setup({
 				-- or leave it empty to use the default settings
 				-- refer to the configuration section below
 				plugins = {
-					marks = true, -- shows a list of your marks on ' and `
+					marks = false, -- shows a list of your marks on ' and `
 					registers = false, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
 					spelling = {
 						enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
@@ -317,7 +317,6 @@ require("lazy").setup({
 		config = true,
 	},
 	{
-		-- TODO: customize
 		"nvim-neo-tree/neo-tree.nvim",
 		branch = "v3.x",
 		dependencies = {
@@ -328,7 +327,23 @@ require("lazy").setup({
 		keys = {
 			{ "<leader>e", "<CMD>Neotree toggle reveal_force_cwd<CR>", desc = "Explorer", mode = { "n", "v" } },
 		},
+		opts = {
+			filesystem = {
+				filtered_items = {
+					hide_dotfiles = false,
+					hide_gitignored = false,
+				},
+			},
+		},
 		config = true,
+	},
+	{
+		"pmizio/typescript-tools.nvim",
+		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig", "VonHeikemen/lsp-zero.nvim" },
+		opts = {},
+	},
+	{
+		"itchyny/vim-cursorword",
 	},
 	{ "ethanholz/nvim-lastplace", config = true },
 	{
@@ -354,6 +369,8 @@ require("lazy").setup({
 			{ "<leader>sw", "<CMD>Telescope grep_string<CR>", desc = "Word under cursor", mode = { "n", "v" } },
 			{ "<leader>sk", "<CMD>Telescope keymaps<CR>", desc = "Keymap", mode = { "n", "v" } },
 			{ "<leader>sh", "<CMD>Telescope help_tags<CR>", desc = "Help", mode = { "n", "v" } },
+			{ "'", "<CMD>Telescope marks<CR>", noremap = true, silent = true },
+			{ "`", "<CMD>Telescope marks<CR>", noremap = true, silent = true },
 		},
 		opts = {
 			defaults = {
@@ -461,9 +478,39 @@ require("lazy").setup({
 			-- Extend lsp-zero cmp configs
 			local cmp = require("cmp")
 			local cmp_action = require("lsp-zero").cmp_action()
+			local cmp_format = require("lsp-zero").cmp_format()
+			-- `/` cmdline setup.
+			cmp.setup.cmdline("/", {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = {
+					{ name = "buffer" },
+				},
+			})
+			-- `:` cmdline setup.
+			cmp.setup.cmdline(":", {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = cmp.config.sources({
+					{ name = "buffer" },
+					{ name = "path" },
+				}),
+			})
+			require("luasnip.loaders.from_vscode").lazy_load()
 			cmp.setup({
 				-- TODO: enter to insert, ctrl-enter to replace
 				preselect = cmp.PreselectMode.None,
+				sources = {
+					{ name = "nvim_lsp" },
+					{ name = "path" },
+					{ name = "buffer" },
+					{ name = "nvim_lua" },
+					{ name = "luasnip" },
+				},
+				snippet = {
+					expand = function(args)
+						require("luasnip").lsp_expand(args.body)
+					end,
+				},
+				formatting = cmp_format,
 				completion = {
 					completeopt = "menu, meunone, noselect, preview",
 					-- Override trigger characters to ignore closing tag: see https://github.com/hrsh7th/nvim-cmp/issues/1055
@@ -663,13 +710,13 @@ require("lazy").setup({
 				highlight = {
 					enable = true,
 					-- disable slow treesitter highlight for large files
-					disable = function(lang, buf)
-						local max_filesize = 20 * 1024 -- 20 KB
-						local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-						if ok and stats and stats.size > max_filesize then
-							return true
-						end
-					end,
+					-- disable = function(lang, buf)
+					-- 	local max_filesize = 20 * 1024 -- 20 KB
+					-- 	local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+					-- 	if ok and stats and stats.size > max_filesize then
+					-- 		return true
+					-- 	end
+					-- end,
 				},
 				indent = { enable = true },
 				-- disable the default autocmd via the context_commentstring Integrations guide:
@@ -1163,5 +1210,53 @@ require("lazy").setup({
 		--     },
 		--   },
 		-- }
+	},
+	{
+		"ThePrimeagen/git-worktree.nvim",
+		dependencies = "nvim-telescope/telescope.nvim",
+		opts = {},
+		config = function(_, opts)
+			require("git-worktree").setup({
+				-- change_directory_command = <str> -- default: "cd",
+				-- update_on_change = <boolean> -- default: true,
+				-- update_on_change_command = <str> -- default: "e .",
+				-- clearjumps_on_change = <boolean> -- default: true,
+				-- autopush = <boolean> -- default: false,
+			})
+			require("telescope").load_extension("git_worktree")
+		end,
+		keys = {
+			{
+				"<leader>gwta",
+				":lua require('telescope').extensions.git_worktree.create_git_worktree()<cr>",
+				desc = "Git worktree add",
+			},
+		},
+	},
+	{
+		"chentoast/marks.nvim",
+		lazy = false,
+		default_mappings = false,
+		opts = {
+			mapping = {
+				set = "m", -- Sets a letter mark (will wait for input).;
+				set_next = "m,",
+				toggle = "m;", -- Set next available lowercase mark at cursor.
+				delete_line = "dm-", -- Deletes all marks on current line.
+				delete_buf = "dm<space>", -- Deletes all marks in current buffer.
+				next = "m]", -- Goes to next mark in buffer.
+				prev = "m[", -- Goes to previous mark in buffer.
+				preview = "m:", -- Previews mark (will wait for user input). press <cr> to just preview the next mark.
+				delete = "dm", -- Delete a letter mark (will wait for input).
+				-- set_bookmark0 = "m0", -- Sets a bookmark from group[0-9].
+				-- delete_bookmark[0-9] = "", -- Deletes all bookmarks from group[0-9].
+				delete_bookmark = "dm=", -- Deletes the bookmark under the cursor.
+				next_bookmark = "m}", -- Moves to the next bookmark having the same type as the bookmark under the cursor.
+				prev_bookmark = "m{", -- Moves to the previous bookmark having the same type as the bookmark under the cursor.
+				-- next_bookmark[0-9] = "", -- Moves to the next bookmark of the same group type. Works by first going according to line number, and then according to buffer number.
+				-- prev_bookmark[0-9] = "", -- Moves to the previous bookmark of the same group type. Works by first going according to line number, and then according to buffer number.
+				-- annotate = "", -- Prompts the user for a virtual line annotation that is then placed above the bookmark. Requires neovim 0.6+ and is not mapped by default.
+			},
+		},
 	},
 })
