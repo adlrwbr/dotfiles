@@ -28,6 +28,85 @@ source /home/adler/.config/op/plugins.sh
 export PNPM_HOME="/home/adler/.local/share/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 
+# enable miniconda3
+[ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
+
+# >>> mamba initialize >>>
+# !! Contents within this block are managed by 'mamba init' !!
+export MAMBA_EXE='/usr/bin/micromamba';
+export MAMBA_ROOT_PREFIX='/home/adler/micromamba';
+__mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__mamba_setup"
+else
+    alias micromamba="$MAMBA_EXE"  # Fallback on help from mamba activate
+fi
+unset __mamba_setup
+# <<< mamba initialize <<<
+
+# JINA_CLI_BEGIN
+
+## autocomplete
+if [[ ! -o interactive ]]; then
+    return
+fi
+
+compctl -K _jina jina
+
+_jina() {
+  local words completions
+  read -cA words
+
+  if [ "${#words}" -eq 2 ]; then
+    completions="$(jina commands)"
+  else
+    completions="$(jina completions ${words[2,-2]})"
+  fi
+
+  reply=(${(ps:
+:)completions})
+}
+
+# session-wise fix
+ulimit -n 4096
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+# JINA_CLI_END
+
+#compdef k3s
+_cli_zsh_autocomplete() {
+
+	local -a opts
+	local cur
+	cur=${words[-1]}
+	if [[ "$cur" == "-"* ]]; then
+	opts=("${(@f)$(_CLI_ZSH_AUTOCOMPLETE_HACK=1 ${words[@]:0:#words[@]-1} ${cur} --generate-bash-completion)}")
+	else
+	opts=("${(@f)$(_CLI_ZSH_AUTOCOMPLETE_HACK=1 ${words[@]:0:#words[@]-1} --generate-bash-completion)}")
+	fi
+
+	if [[ "${opts[1]}" != "" ]]; then
+	_describe 'values' opts
+	else
+	_files
+	fi
+
+	return
+}
+
+compdef _cli_zsh_autocomplete k3s
+eval "$(zoxide init zsh)"
+
+
+# to run my 4775 scDeepSort (which requires tensorflow)
+# after running these try sudo ldconfig
+# export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/adler/.conda/envs/4775-scDeepSort/lib/"
+# export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/adler/.conda/pkgs/cudatoolkit-11.8.0-h6a678d5_0/lib/"
+# export USE_OFFICIAL_TFDLPACK=1
+# test with 
+# python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+
+
 # ============================================================================
 # ⚙  Oh-my-zsh and themes ⚙
 # ============================================================================
@@ -89,7 +168,14 @@ OMZ_AUTOSUGGESTIONS=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestio
 [ -d $OMZ_AUTOSUGGESTIONS ] || git clone https://github.com/zsh-users/zsh-autosuggestions $OMZ_AUTOSUGGESTIONS
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
-plugins=(git zsh-syntax-highlighting zsh-history-substring-search zsh-autosuggestions)
+# lazy load NVM
+zstyle ':omz:plugins:nvm' lazy yes
+# Oh-my-zsh includes nvm, so we don't need these lines:
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+plugins=(git zsh-syntax-highlighting zsh-history-substring-search zsh-autosuggestions nvm poetry)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -97,7 +183,7 @@ source $ZSH/oh-my-zsh.sh
 # ⚙  fzf  ⚙
 # ============================================================================
 if command -v fzf &> /dev/null; then
-    export FZF_ALT_C_COMMAND='fd --type=directory --hidden --follow --exclude={.git,.bare,.idea,.vscode,__pycache__,.conda,site-packages,.sass-cache,.cargo,deps,go,Pods,.mozilla,.npm,pnpm,.local,.cache,node_modules,build,dist,tmp}'
+    export FZF_ALT_C_COMMAND='fd --type=directory --hidden --follow --exclude={.git,.bare,.idea,.gradle,.vscode,__pycache__,.nix,.nix-defexpr,.steam,.rustup,.m2,.vmware,vendor,.conda,pkg,site-packages,.sass-cache,.cargo,.fingerprint,deps,go,Pods,.mozilla,.npm,pnpm,.local,.cache,node_modules,build,dist,tmp}'
 
     source /usr/share/fzf/completion.zsh
 
@@ -173,11 +259,12 @@ function gwtc() {
     DIRNAME="$2"
 
     mkdir -p $DIRNAME
-    git clone --bare $URL "$DIRNAME/.bare"
+    git clone --bare "$URL" "$DIRNAME/.bare"
     echo "gitdir: ./.bare" > "$DIRNAME/.git"
     cd $DIRNAME
     git worktree add main
     cd main
+    git push --set-upstream origin HEAD
 }
 
 # 1Password CLI
@@ -195,8 +282,10 @@ alias gs="git status"
 
 # custom path/env vars
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin/armv6:$PATH"
 export TERMINAL="kitty" # rofi uses this var to launch scripts / ssh
 export MYACE_AWS_PROFILE="myace"
 export AWS_PROFILE="carbonweb"
 export AWS_PROFILE="friday"
 export AWS_PROFILE="herme"
+export AWS_PROFILE="roam"
