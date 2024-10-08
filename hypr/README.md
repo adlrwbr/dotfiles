@@ -2,12 +2,13 @@
 
 ## Dependencies
 ```
-yay -S swaync pipewire wireplumber xdg-desktop-portal-hyprland-git grim slurp waybar-hyprland-git eww-wayland swaylock-effects-git swayidle wl-clipboard grimblast-git polkit-gnome gnome-keyring libsecret brightnessctl pavucontrol nm-applet kanshi hyprpicker swaybg wallutils
+yay -S swaync pipewire wireplumber xdg-desktop-portal-hyprland-git grim slurp waybar-hyprland-git eww-wayland swaylock-effects-git hypridle wl-clipboard grimblast-git polkit-gnome gnome-keyring libsecret brightnessctl pavucontrol nm-applet kanshi hyprpicker swaybg wallutils
 ```
 
 ## rofi applets
 
 `yay -S rofi-wayland rofimoji wtype`
+See https://github.com/hyprwm/Hyprland/issues/5142#issuecomment-2002373675
 
 My theme is based on those provided by
 https://github.com/adi1090x/rofi
