@@ -1,7 +1,9 @@
 * {
   border: none;
   border-radius: 0;
-  font-family: Cartograph CF Nerd Font, monospace;
+  font-family:
+    Cartograph CF Nerd Font,
+    monospace;
   font-weight: bold;
   font-size: 14px;
   min-height: 0;
@@ -26,17 +28,17 @@ tooltip {
   margin-right: 5px;
 }
 
-#workspaces button.active {
+#workspaces .active {
   color: #a6adc8;
 }
 
-#workspaces button.focused {
+#workspaces .focused {
   color: #a6adc8;
   background: #eba0ac;
   border-radius: 10px;
 }
 
-#workspaces button.urgent {
+#workspaces .urgent {
   color: #11111b;
   background: #a6e3a1;
   border-radius: 10px;
@@ -48,13 +50,13 @@ tooltip {
   border-radius: 10px;
 }
 
-#hyprland-language,
+#language,
 #custom-pacman,
-#custom-caffeine,
 #custom-weather,
 #custom-todos,
 #window,
 #clock,
+#idle_inhibitor,
 #battery,
 #pulseaudio,
 #network,
@@ -62,10 +64,9 @@ tooltip {
 #tray,
 #backlight {
   background: #1e1e2e;
-  padding: 0px 10px;
-  margin: 3px 0px;
-  margin-top: 10px;
   border: 1px solid #181825;
+  padding: 0px 10px;
+  margin: 0px 0px;
 }
 
 #tray {
@@ -83,19 +84,6 @@ tooltip {
   margin-left: 10px;
   padding-right: 0px;
   padding-left: 5px;
-}
-
-#custom-caffeine {
-  color: #89dceb;
-  border-radius: 10px 0px 0px 10px;
-  border-right: 0px;
-  margin-left: 10px;
-}
-
-#custom-language {
-  color: #f38ba8;
-  border-left: 0px;
-  border-right: 0px;
 }
 
 #custom-pacman {
@@ -116,11 +104,20 @@ tooltip {
   margin-right: 60px;
 }
 
+#idle_inhibitor {
+  color: #fab387;
+  border-radius: 0;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0px 10px 10px 0px;
+  border: 0;
+}
+
 #clock {
   color: #fab387;
   border-radius: 10px 0px 0px 10px;
+  border: 0;
   margin-left: 5px;
-  border-right: 0px;
 }
 
 #network {
@@ -151,7 +148,6 @@ tooltip {
 }
 
 #custom-weather {
-  border-radius: 0px 10px 10px 0px;
-  border-right: 0px;
+  border: 0;
   margin-left: 0px;
 }
