@@ -13,9 +13,11 @@ vim.opt.mouse = "a" -- allow the mouse to be used in neovim. Particularly useful
 vim.opt.mousemoveevent = true
 vim.opt.smartcase = true
 vim.opt.smartindent = true
-vim.opt.foldmethod = "expr" -- folding set to "expr" for treesitter based folding
+
+vim.opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
 vim.opt.foldlevelstart = 99 -- open file with expanded folds
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()" -- set for treesitter based folding
+vim.opt.foldenable = true
+
 vim.opt.relativenumber = true -- show relative line numbers
 vim.opt.number = true -- show current line number
 vim.opt.splitbelow = true -- force all horizontal splits to go below current window
@@ -35,7 +37,7 @@ vim.opt.confirm = true -- instead of failing on :q with unsaved changed, prompt 
 
 -- show special characters for tabs, trailing spaces, etc.
 vim.opt.list = true
-vim.opt.listchars = "tab:▸-◂,trail:·,precedes:◁,extends:▷"
+vim.opt.listchars = "tab:▸ ◂,trail:·,precedes:◁,extends:▷"
 
 vim.opt.swapfile = false -- do not create a swapfile
 vim.opt.undofile = true -- enable persistent undo
@@ -50,7 +52,7 @@ vim.opt.updatetime = 300 -- faster completion (4000ms default)
 
 -- vim.api.nvim_set_var("matchparen_timeout", 2)
 -- vim.o.noshowmatch = true
-vim.g.loaded_matchparen = 1
+-- vim.g.loaded_matchparen = 1 -- explicitly disable match paren
 -- vim.g.matchparen_timeout = 2
 vim.api.nvim_set_var("cmdheight", 1)
 
@@ -85,37 +87,62 @@ vim.api.nvim_create_autocmd("BufEnter", {
 	command = "setlocal wrap",
 })
 
+-- Fix comment autoindentation in Python files [StackOverflow](https://stackoverflow.com/questions/2360249/vim-automatically-removes-indentation-on-python-comments)
+vim.api.nvim_create_autocmd("BufEnter", {
+	pattern = { "*.py" },
+	command = "setlocal nosmartindent",
+})
+
+-- Set harmony filetype and commentstring
+vim.filetype.add({
+	extension = {
+		hny = "harmony",
+	},
+})
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+	pattern = "*.hny",
+	callback = function()
+		vim.api.nvim_buf_set_option(0, "commentstring", "# %s")
+	end,
+})
+
+vim.filetype.add({
+	extension = {
+		typ = "typst",
+	},
+})
+
 -------------------------------------------------------------------------------
 -- Keymap
 -------------------------------------------------------------------------------
-local opts = { silent = true }
+local key_opts = { silent = true }
 
 -- Remap space as leader key
-vim.keymap.set("", "<space>", "<nop>", opts)
+vim.keymap.set("", "<space>", "<nop>", key_opts)
 vim.g.mapleader = " "
 
 -- Allow gf to open non-existent files
-vim.keymap.set("n", "gf", ":edit <cfile><cr>", opts)
+vim.keymap.set("n", "gf", ":edit <cfile><cr>", key_opts)
 
 -- Reselect visual selection after indenting
-vim.keymap.set("v", "<", "<gv", opts)
-vim.keymap.set("v", ">", ">gv", opts)
+vim.keymap.set("v", "<", "<gv", key_opts)
+vim.keymap.set("v", ">", ">gv", key_opts)
 
 -- Switch buffers
-vim.keymap.set("n", "H", ":bprevious<cr>", opts)
-vim.keymap.set("n", "L", ":bnext<cr>", opts)
+vim.keymap.set("n", "H", ":bprevious<cr>", key_opts)
+vim.keymap.set("n", "L", ":bnext<cr>", key_opts)
 
 -- Switch windows
-vim.keymap.set("n", "<C-l>", "<C-w>l", opts)
-vim.keymap.set("n", "<C-h>", "<C-w>h", opts)
-vim.keymap.set("n", "<C-j>", "<C-w>j", opts)
-vim.keymap.set("n", "<C-k>", "<C-w>k", opts)
+vim.keymap.set("n", "<C-l>", "<C-w>l", key_opts)
+vim.keymap.set("n", "<C-h>", "<C-w>h", key_opts)
+vim.keymap.set("n", "<C-j>", "<C-w>j", key_opts)
+vim.keymap.set("n", "<C-k>", "<C-w>k", key_opts)
 
 -- Put-replace without copying
-vim.keymap.set("v", "<leader>p", '"_dp', opts)
+vim.keymap.set("v", "<leader>p", '"_dp', key_opts)
 
 -- By default C-d is "De-Tab" and C-t is "Tab". I prefer shift-tab
-vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
+vim.keymap.set("i", "<S-Tab>", "<C-d>", key_opts)
 
 -------------------------------------------------------------------------------
 -- A script that automatically closes untouched buffers
@@ -228,7 +255,9 @@ require("lazy").setup({
 					name = "Git",
 					t = { name = "Toggle" },
 					d = { name = "Diffview" },
+					c = { name = "Git Conflict" },
 				},
+				c = { ":clo<CR>", "Close window" },
 				n = {
 					name = "Neovim",
 					c = { ":e ~/.config/nvim/init.lua<CR>", "Edit Config" },
@@ -277,20 +306,6 @@ require("lazy").setup({
 				},
 				d = {
 					name = "Debug",
-					t = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", "Toggle Breakpoint" },
-					b = { "<cmd>lua require'dap'.step_back()<cr>", "Step Back" },
-					c = { "<cmd>lua require'dap'.continue()<cr>", "Continue" },
-					C = { "<cmd>lua require'dap'.run_to_cursor()<cr>", "Run To Cursor" },
-					d = { "<cmd>lua require'dap'.disconnect()<cr>", "Disconnect" },
-					g = { "<cmd>lua require'dap'.session()<cr>", "Get Session" },
-					i = { "<cmd>lua require'dap'.step_into()<cr>", "Step Into" },
-					o = { "<cmd>lua require'dap'.step_over()<cr>", "Step Over" },
-					u = { "<cmd>lua require'dap'.step_out()<cr>", "Step Out" },
-					p = { "<cmd>lua require'dap'.pause()<cr>", "Pause" },
-					r = { "<cmd>lua require'dap'.repl.toggle()<cr>", "Toggle Repl" },
-					s = { "<cmd>lua require'dap'.continue()<cr>", "Start" },
-					q = { "<cmd>lua require'dap'.close()<cr>", "Quit" },
-					U = { "<cmd>lua require'dapui'.toggle({reset = true})<cr>", "Toggle UI" },
 				},
 				l = {
 					name = "LSP",
@@ -325,7 +340,12 @@ require("lazy").setup({
 			"MunifTanjim/nui.nvim",
 		},
 		keys = {
-			{ "<leader>e", "<CMD>Neotree toggle reveal_force_cwd<CR>", desc = "Explorer", mode = { "n", "v" } },
+			{
+				"<leader>e",
+				"<CMD>Neotree toggle reveal_force_cwd position=right<CR>",
+				desc = "Explorer",
+				mode = { "n", "v" },
+			},
 		},
 		opts = {
 			filesystem = {
@@ -364,18 +384,43 @@ require("lazy").setup({
 				desc = "All files",
 				mode = { "n", "v" },
 			},
+			{
+				"<leader>sg",
+				function()
+					local pickers = require("telescope.pickers")
+					local finders = require("telescope.finders")
+					local conf = require("telescope.config").values
+					list = vim.fn.systemlist("git diff --name-only main")
+
+					pickers
+						.new(opts, {
+							prompt_title = "git diff",
+							finder = finders.new_table({ results = list }),
+							sorter = conf.generic_sorter(opts),
+						})
+						:find()
+				end,
+				desc = "Git files",
+				mode = { "n", "v" },
+			},
 			{ "<leader>f", "<CMD>Telescope find_files<CR>", desc = "Search file", mode = { "n", "v" } },
 			{ "<leader>st", "<CMD>Telescope live_grep<CR>", desc = "Text", mode = { "n", "v" } },
+			{
+				"<leader>sb",
+				"<CMD>Telescope current_buffer_fuzzy_find<CR>",
+				desc = "Search buffer",
+				mode = { "n", "v" },
+			},
 			{ "<leader>sw", "<CMD>Telescope grep_string<CR>", desc = "Word under cursor", mode = { "n", "v" } },
 			{ "<leader>sk", "<CMD>Telescope keymaps<CR>", desc = "Keymap", mode = { "n", "v" } },
 			{ "<leader>sh", "<CMD>Telescope help_tags<CR>", desc = "Help", mode = { "n", "v" } },
-			{ "'", "<CMD>Telescope marks<CR>", noremap = true, silent = true },
-			{ "`", "<CMD>Telescope marks<CR>", noremap = true, silent = true },
+			-- { "'", "<CMD>Telescope marks default_text=^<CR>", noremap = true, silent = true },
+			-- { "`", "<CMD>Telescope marks default_text=^<CR>", noremap = true, silent = true },
 		},
 		opts = {
 			defaults = {
 				wrap_results = true,
-				prompt_prefix = "🥴🔭> ",
+				prompt_prefix = " 🥴🔭> ",
 				file_ignore_patterns = { ".git/", "node_modules/" },
 			},
 			pickers = {
@@ -392,8 +437,7 @@ require("lazy").setup({
 	{
 		"folke/neodev.nvim",
 		-- TODO: is this working properly?
-		opts = {},
-		config = function(self, opts)
+		config = function()
 			require("neodev").setup({
 				library = { plugins = { "nvim-dap-ui" }, types = true },
 			})
@@ -426,6 +470,11 @@ require("lazy").setup({
 			"hrsh7th/cmp-cmdline",
 			"saadparwaiz1/cmp_luasnip",
 			"hrsh7th/cmp-nvim-lua",
+			{
+				"zbirenbaum/copilot-cmp",
+				dependencies = "zbirenbaum/copilot.lua",
+				opts = {},
+			},
 
 			-- Snippets
 			"L3MON4D3/LuaSnip",
@@ -435,28 +484,60 @@ require("lazy").setup({
 			local lsp_zero = require("lsp-zero")
 			lsp_zero.preset({ name = "recommended" })
 
-			-- Configure lua language server for neovim
-			require("lspconfig").lua_ls.setup({
-				settings = {
-					Lua = {
-						diagnostics = {
-							-- force the language server to recognize the `vim` global
-							globals = { "vim" },
-						},
-						workspace = {
-							-- Disbale LuaLS prompt for standalone files: https://github.com/LunarVim/LunarVim/issues/4049#issuecomment-1634539474
-							checkThirdParty = false,
-						},
-					},
-				},
-			})
 			vim.diagnostic.config({ virtual_text = true })
 
 			require("mason").setup({})
 			require("mason-lspconfig").setup({
-				ensure_installed = {},
+				ensure_installed = { "texlab" },
 				handlers = {
 					lsp_zero.default_setup,
+					-- Via [lsp-zero docs](https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/lsp.md#configure-language-servers)
+					-- Configure the clangd language server (I was getting an "multiple offset encoding" error when trying to lsp hover in C)
+					["clangd"] = function()
+						require("lspconfig").clangd.setup({
+							cmd = { "clangd", "--offset-encoding=utf-16" },
+						})
+					end,
+					["lua_ls"] = function()
+						-- Configure lua language server for neovim
+						require("lspconfig").lua_ls.setup({
+							settings = {
+								Lua = {
+									diagnostics = {
+										-- force the language server to recognize the `vim` global
+										globals = { "vim" },
+									},
+									workspace = {
+										-- Disbale LuaLS prompt for standalone files: https://github.com/LunarVim/LunarVim/issues/4049#issuecomment-1634539474
+										checkThirdParty = false,
+									},
+								},
+							},
+						})
+					end,
+					["yamlls"] = function()
+						local capabilities = vim.lsp.protocol.make_client_capabilities()
+						capabilities.textDocument.foldingRange = {
+							dynamicRegistration = false,
+							lineFoldingOnly = true,
+						}
+						require("lspconfig").yamlls.setup({
+							capabilities = capabilities,
+							settings = {
+								yaml = {
+									schemas = {
+										kubernetes = "/*.yaml",
+										["https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json"] = {
+											"**/.github/workflows/*.yml",
+											"**/.github/workflows/*.yaml",
+										},
+										-- Add the schema for gitlab piplines
+										-- ["https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json"] = "*.gitlab-ci.yml",
+									},
+								},
+							},
+						})
+					end,
 				},
 			})
 
@@ -480,7 +561,7 @@ require("lazy").setup({
 			local cmp_action = require("lsp-zero").cmp_action()
 			local cmp_format = require("lsp-zero").cmp_format()
 			-- `/` cmdline setup.
-			cmp.setup.cmdline("/", {
+			cmp.setup.cmdline({ "/", "?" }, {
 				mapping = cmp.mapping.preset.cmdline(),
 				sources = {
 					{ name = "buffer" },
@@ -489,10 +570,7 @@ require("lazy").setup({
 			-- `:` cmdline setup.
 			cmp.setup.cmdline(":", {
 				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({
-					{ name = "buffer" },
-					{ name = "path" },
-				}),
+				sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
 			})
 			require("luasnip.loaders.from_vscode").lazy_load()
 			cmp.setup({
@@ -504,6 +582,7 @@ require("lazy").setup({
 					{ name = "buffer" },
 					{ name = "nvim_lua" },
 					{ name = "luasnip" },
+					{ name = "copilot" },
 				},
 				snippet = {
 					expand = function(args)
@@ -545,18 +624,21 @@ require("lazy").setup({
 		keys = {
 			{ "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
 			{ "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
-
+			{ "<leader>ld", "<cmd>lua vim.diagnostic.open_float()<cr>", desc = "Prev Diagnostic" },
 			{ "K", "<cmd>lua vim.lsp.buf.hover()<cr>", desc = "Prev Diagnostic" },
-
 			{ "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", desc = "Go to definition" },
 			{ "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", desc = "Go to declaration" },
 			{ "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", desc = "Go to implementation" },
 			{ "gr", "<cmd>lua vim.lsp.buf.references()<CR>", desc = "Go to references" },
 			{ "gT", "<cmd>lua vim.lsp.buf.type_definition()<CR>", desc = "Go to type definition" },
 			{ "gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>", desc = "Get signature help" },
-			{ "<C-s>", "<cmd>lua vim.lsp.buf.signature_help()<cr>", mode = { "i" }, desc = "Get signature help" },
+			{
+				"<C-s>",
+				"<cmd>lua vim.lsp.buf.signature_help()<cr>",
+				mode = { "i" },
+				desc = "Get signature help",
+			},
 			{ "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code Action" },
-			{ "<leader>ld", "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", desc = "Buffer Diagnostics" },
 			{ "<leader>lw", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
 			{ "<leader>lff", "<cmd>lua vim.lsp.buf.format()<cr>", desc = "Format with LSP" },
 			{ "<leader>li", "<cmd>LspInfo<cr>", desc = "Info" },
@@ -570,72 +652,127 @@ require("lazy").setup({
 		},
 	},
 	{
-		"elentok/format-on-save.nvim",
+		"stevearc/conform.nvim",
+		event = { "BufWritePre" },
+		cmd = { "FormatDisable", "FormatEnable", "ConformInfo", "Conform" },
 		keys = {
-			{ "<leader>lfd", "<cmd>FormatOff<cr>", desc = "Disable format on save" },
-			{ "<leader>lfe", "<cmd>FormatOn<cr>", desc = "Enable format on save" },
+			{ "<leader>lfi", "<cmd>ConformInfo<cr>", desc = "Formatter info" },
+			{ "<leader>lfl", ":h conform-formatters<cr>", desc = "Formatter list" },
+			{ "<leader>lfd", "<cmd>FormatDisable<cr>", desc = "Disable format on save" },
+			{ "<leader>lfe", "<cmd>FormatEnable<cr>", desc = "Enable format on save" },
 		},
-		lazy = false,
-		config = function()
-			local format_on_save = require("format-on-save")
-			local formatters = require("format-on-save.formatters")
-
-			-- Check if the buffer file is in a project using prettier
-			local function prettier_project()
-				-- Search for a package.json file in the current dir or its parents
-				local package_json = vim.fn.findfile("package.json", ".;")
-				if not package_json then
-					return nil
-				end
-				-- Is prettier installed in package.json?
-				local file = io.open(package_json, "r")
-				if not file then
-					return nil
-				end
-				local content = file:read("*a")
-				file:close()
-				return string.match(content, "prettier") ~= nil
-			end
-
-			---@type ErrorNotifier test
-			local error_notifier = {
-				show = function(opts)
-					-- use opts.title and opts.body
-				end,
-				hide = function()
-					-- hide the error when it's been resolved
-				end,
-			}
-
-			format_on_save.setup({
-				exclude_path_patterns = {
-					"/node_modules/",
-					".local/share/nvim/lazy",
+		opts = {
+			notify_on_error = false, -- Disable the error notification
+			formatters_by_ft = { -- See `:h conform-formatters` for a list of supported formatters
+				lua = { "stylua" },
+				-- Conform runs multiple formatters sequentially
+				python = { "isort", "black" },
+				-- Use a sub-list to run only the first available formatter
+				javascript = { { "prettierd", "prettier" } },
+				javascriptreact = { { "prettierd", "prettier" } },
+				typescript = { { "prettierd", "prettier" } },
+				typescriptreact = { { "prettierd", "prettier" } },
+				-- typescript = { { "biome-check", "prettier" } }, -- prettierd is messing up utility types like Omit and Pick
+				-- typescriptreact = { { "biome-check", "prettier" } },
+				sh = { "shfmt" },
+				rust = { "rustfmt" }, -- When I develop w rust, I usually use rust-analyzer, which executes `cargo fmt`. The LSP is not available when injected in markdown, though, so I'm specifying the ft here.
+				-- Use treesitter to format fenced code blocks
+				markdown = { "injected" },
+			},
+			formatters = {
+				rustfmt = {
+					-- you can override formatter options here
+					args = { "--edition", "2021" },
 				},
-				-- disable annoying vim.notify() error notification
-				error_notifier = error_notifier,
-				formatter_by_ft = {
-					lua = formatters.stylua,
-					rust = formatters.lsp,
-					sh = formatters.shfmt,
-					-- Concatenate formatters
-					python = {
-						formatters.remove_trailing_whitespace,
-						-- formatters.shell({ cmd = "tidy-imports" }),
-						formatters.black,
-					},
-				},
-				-- fallback formatter to use when no formatters match the current filetype
-				fallback_formatter = function()
-					if prettier_project() then
-						-- vim.notify("Formatting with Prettier")
-						return formatters.prettierd
-					else
-						-- vim.notify("Formatting with LSP")
-						return formatters.lsp()
-					end
-				end,
+			},
+			format_on_save = function(bufnr)
+				-- Disable with a global or buffer-local variable
+				if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+					return
+				end
+				-- Disable autoformat for files in a certain path
+				local bufname = vim.api.nvim_buf_get_name(bufnr)
+				if bufname:match("/node_modules/") then
+					return
+				end
+				-- These options will be passed to conform.format()
+				return { timeout_ms = 500, lsp_fallback = true }
+			end,
+		},
+		config = function(_, opts)
+			require("conform").setup(opts)
+			vim.api.nvim_create_user_command("FormatDisable", function(args)
+				if args.bang then
+					-- FormatDisable! will disable formatting just for this buffer
+					vim.b.disable_autoformat = true
+				else
+					vim.g.disable_autoformat = true
+				end
+			end, {
+				desc = "Disable autoformat-on-save",
+				bang = true,
 			})
+			vim.api.nvim_create_user_command("FormatEnable", function()
+				vim.b.disable_autoformat = false
+				vim.g.disable_autoformat = false
+			end, {
+				desc = "Re-enable autoformat-on-save",
+			})
+		end,
+	},
+	{
+		"kevinhwang91/nvim-ufo",
+		dependencies = { "kevinhwang91/promise-async" },
+		opts = {
+			-- Override the virtual text to show the number of lines folded
+			fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+				local newVirtText = {}
+				local suffix = (" 󰁂 %d "):format(endLnum - lnum)
+				local sufWidth = vim.fn.strdisplaywidth(suffix)
+				local targetWidth = width - sufWidth
+				local curWidth = 0
+				for _, chunk in ipairs(virtText) do
+					local chunkText = chunk[1]
+					local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+					if targetWidth > curWidth + chunkWidth then
+						table.insert(newVirtText, chunk)
+					else
+						chunkText = truncate(chunkText, targetWidth - curWidth)
+						local hlGroup = chunk[2]
+						table.insert(newVirtText, { chunkText, hlGroup })
+						chunkWidth = vim.fn.strdisplaywidth(chunkText)
+						-- str width returned from truncate() may less than 2nd argument, need padding
+						if curWidth + chunkWidth < targetWidth then
+							suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
+						end
+						break
+					end
+					curWidth = curWidth + chunkWidth
+				end
+				table.insert(newVirtText, { suffix, "MoreMsg" })
+				return newVirtText
+			end,
+		},
+		config = function(_, opts)
+			-- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+			vim.keymap.set("n", "zR", require("ufo").openAllFolds)
+			vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
+			-- Provider option 2: nvim lsp as LSP client
+			-- Tell the server the capability of foldingRange,
+			-- Neovim hasn't added foldingRange to default capabilities, users must add it manually			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			capabilities.textDocument.foldingRange = {
+				dynamicRegistration = false,
+				lineFoldingOnly = true,
+			}
+			local language_servers = require("lspconfig").util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
+			for _, ls in ipairs(language_servers) do
+				require("lspconfig")[ls].setup({
+					capabilities = capabilities,
+					-- you can add other fields for setting up lsp server in this table
+				})
+			end
+			require("ufo").setup(opts)
 		end,
 	},
 	{
@@ -674,7 +811,13 @@ require("lazy").setup({
 				end,
 			},
 			"nvim-treesitter/playground",
-			"JoosepAlviste/nvim-ts-context-commentstring",
+			{
+
+				"JoosepAlviste/nvim-ts-context-commentstring",
+				-- disable the default autocmd via the context_commentstring Integrations guide:
+				-- https://github.com/JoosepAlviste/nvim-ts-context-commentstring/wiki/Integrations#nvim-comment
+				opts = { enable_autocmd = false },
+			},
 			{
 				"nvim-treesitter/nvim-treesitter-context",
 				keys = {
@@ -719,9 +862,6 @@ require("lazy").setup({
 					-- end,
 				},
 				indent = { enable = true },
-				-- disable the default autocmd via the context_commentstring Integrations guide:
-				-- https://github.com/JoosepAlviste/nvim-ts-context-commentstring/wiki/Integrations#nvim-comment
-				context_commentstring = { enable = true, enable_autocmd = false },
 
 				incremental_selection = {
 					enable = true,
@@ -752,6 +892,20 @@ require("lazy").setup({
 					},
 				},
 			})
+
+			-- Configure parser for Harmony lang
+			local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+			parser_config.harmony = {
+				install_info = {
+					url = "~/cornell/cs4410-os/tree-sitter-harmony", -- local path or git repo
+					files = { "src/parser.c" }, -- note that some parsers also require src/scanner.c or src/scanner.cc
+					-- optional entries:
+					branch = "main", -- default branch in case of git repo if different from master
+					generate_requires_npm = false, -- if stand-alone parser without npm dependencies
+					requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
+				},
+				filetype = "harmony", -- if filetype does not match the parser name
+			}
 		end,
 	},
 	{
@@ -769,6 +923,55 @@ require("lazy").setup({
 					end,
 				},
 			}
+			-- Debug Rust email-client project. See https://romangeber.com/blog/tech/nvim_rust_debugger to set up per-project debugger
+			dap.adapters.lldb = { -- install with :Mason
+				type = "executable",
+				command = "/usr/bin/lldb-vscode",
+				name = "lldb",
+			}
+			dap.configurations.rust = {
+				{
+					name = "email-client",
+					type = "lldb",
+					request = "launch",
+					program = function()
+						-- return vim.fn.getcwd() .. "/test_queue"
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopOnEntry = true,
+					args = {},
+				},
+			}
+
+			-- Debug C/C++
+			-- dap.adapters.gdb = {
+			-- 	type = "executable",
+			-- 	command = "gdb",
+			-- 	args = { "-i", "dap" },
+			-- }
+
+			-- Install cpptools with Mason
+			-- https://github.com/mfussenegger/nvim-dap/wiki/C-C---Rust-(gdb-via--vscode-cpptools)
+			dap.adapters.cppdbg = {
+				type = "executable",
+				command = "/home/adler/.local/share/nvim/mason/bin/OpenDebugAD7",
+				id = "cppdbg",
+			}
+			dap.configurations.c = {
+				{
+					name = "Launch file",
+					type = "cppdbg",
+					request = "launch",
+					program = function()
+						-- return vim.fn.getcwd() .. "/test_queue"
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopAtEntry = true,
+				},
+			}
+
 			-- Automatically read VSCode launch.json
 			require("dap.ext.vscode").load_launchjs(nil, {
 				["pwa-node"] = {
@@ -786,6 +989,23 @@ require("lazy").setup({
 		"rcarriga/nvim-dap-ui",
 		dependencies = {
 			"mfussenegger/nvim-dap",
+			"nvim-neotest/nvim-nio",
+		},
+		keys = {
+			{ "<leader>dt", "<cmd>lua require'dap'.toggle_breakpoint()<cr>", desc = "Toggle Breakpoint" },
+			{ "<leader>db", "<cmd>lua require'dap'.step_back()<cr>", desc = "Step Back" },
+			{ "<leader>dc", "<cmd>lua require'dap'.continue()<cr>", desc = "Continue" },
+			{ "<leader>dC", "<cmd>lua require'dap'.run_to_cursor()<cr>", desc = "Run To Cursor" },
+			{ "<leader>dd", "<cmd>lua require'dap'.disconnect()<cr>", desc = "Disconnect" },
+			{ "<leader>dg", "<cmd>lua require'dap'.session()<cr>", desc = "Get Session" },
+			{ "<leader>di", "<cmd>lua require'dap'.step_into()<cr>", desc = "Step Into" },
+			{ "<leader>do", "<cmd>lua require'dap'.step_over()<cr>", desc = "Step Over" },
+			{ "<leader>du", "<cmd>lua require'dap'.step_out()<cr>", desc = "Step Out" },
+			{ "<leader>dp", "<cmd>lua require'dap'.pause()<cr>", desc = "Pause" },
+			{ "<leader>dr", "<cmd>lua require'dap'.repl.toggle()<cr>", desc = "Toggle Repl" },
+			{ "<leader>ds", "<cmd>lua require'dap'.continue()<cr>", desc = "Start" },
+			{ "<leader>dq", "<cmd>lua require'dap'.close()<cr>", desc = "Quit" },
+			{ "<leader>dU", "<cmd>lua require'dapui'.toggle({reset = true})<cr>", desc = "Toggle UI" },
 		},
 		config = function()
 			local dap, dapui = require("dap"), require("dapui")
@@ -798,6 +1018,7 @@ require("lazy").setup({
 			dap.listeners.before.event_exited["dapui_config"] = function()
 				dapui.close()
 			end
+			dapui.setup()
 		end,
 	},
 	{
@@ -846,22 +1067,12 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"windwp/nvim-autopairs",
-		event = "InsertEnter",
-		config = function()
-			-- If you want insert `(` after select function or method item
-			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-			local cmp = require("cmp")
-			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-
-			local Rule = require("nvim-autopairs.rule")
-			local npairs = require("nvim-autopairs")
-			require("nvim-autopairs").setup()
-
-			npairs.add_rules({
-				Rule('"""', '"""', { "graphql" }),
-			})
-		end,
+		"altermo/ultimate-autopair.nvim",
+		event = { "InsertEnter", "CmdlineEnter" },
+		branch = "v0.6", --recommended as each new version will have breaking changes
+		opts = {
+			--Config goes here
+		},
 	},
 	{
 		"windwp/nvim-ts-autotag",
@@ -1022,8 +1233,8 @@ require("lazy").setup({
 			plugins = {
 				twilight = { enabled = false }, -- highlight only active portions of code
 				gitsigns = { enabled = false }, -- disables git signs
-				tmux = { enabled = true }, -- disables the tmux statusline
-				kitty = { enabled = true, font = "+4" }, -- increase font size
+				tmux = { enabled = false }, -- disables the tmux statusline
+				kitty = { enabled = true, font = "-4" }, -- increase font size
 			},
 		},
 		keys = {
@@ -1038,7 +1249,7 @@ require("lazy").setup({
 			options = {
 				-- separator_style = "slant",
 				diagnostics = "nvim_lsp",
-				diagnostics_indicator = function(num, _, diagnostics, _)
+				diagnostics_indicator = function(_, _, diagnostics, _)
 					local result = {}
 					local symbols = {
 						error = "",
@@ -1113,7 +1324,14 @@ require("lazy").setup({
 		},
 	},
 	{
+		"brenoprata10/nvim-highlight-colors",
+		opts = {
+			enable_tailwind = true,
+		},
+	},
+	{
 		"NvChad/nvim-colorizer.lua",
+		enable = false,
 		opts = {
 			filetypes = {
 				"*", -- highlight all files but customize some others
@@ -1162,14 +1380,17 @@ require("lazy").setup({
 		enabled = true,
 		main = "ibl",
 		opts = {
-			-- show_current_context = true,
-			-- show_current_context_start = true
+			scope = {
+				enabled = false,
+			},
 		},
 	},
 	{
 		"JellyApple102/easyread.nvim",
-		ft = "text",
-		config = true,
+		ft = { "text", "typst" },
+		opts = {
+			fileTypes = { "text", "typst", "markdown" },
+		},
 	},
 	{
 		"nmac427/guess-indent.nvim",
@@ -1179,7 +1400,7 @@ require("lazy").setup({
 	{
 		"LunarVim/bigfile.nvim",
 		lazy = false,
-		config = true,
+		opts = {},
 	},
 	{
 		"stevearc/dressing.nvim",
@@ -1212,10 +1433,47 @@ require("lazy").setup({
 		-- }
 	},
 	{
+		"lervag/vimtex",
+		init = function()
+			-- Via README, "use init for config, do NOT use the more common 'config'"
+			-- This [blog post](https://blog.epheme.re/software/nvim-latex.html) was very helpful in setting up Latex with nvim
+			vim.g.vimtex_view_general_viewer = "zathura" -- make sure zathura is installed along with pdf plugin (e.g. zathura-pdf-mupdf)
+			vim.g.vimtex_view_zathura_options = "-reuse-instance"
+			vim.g.tex_flavor = "latex"
+			vim.g.vimtex_compiler_method = "latexmk" -- make sure latexmk is installed
+			vim.g.vimtex_compiler_latexmk = {
+				callback = 1,
+				continuous = 1,
+				executable = "latexmk",
+				options = {
+					"-shell-escape",
+					"-verbose",
+					"-file-line-error",
+					"-synctex=1",
+					"-interaction=nonstopmode",
+				},
+			}
+			-- vim.api.nvim_create_autocmd("BufReadPre", {
+			-- 	pattern = "*.tex",
+			-- 	callback = function()
+			-- 		vim.api.nvim_buf_set_option(0, "vimtex_main", "~/cornell/math2210/project/main.tex")
+			-- 	end,
+			-- })
+		end,
+	},
+	{
+
+		"chomosuke/typst-preview.nvim",
+		ft = "typst",
+		version = "0.1.*",
+		build = function()
+			require("typst-preview").update()
+		end,
+	},
+	{
 		"ThePrimeagen/git-worktree.nvim",
 		dependencies = "nvim-telescope/telescope.nvim",
-		opts = {},
-		config = function(_, opts)
+		config = function()
 			require("git-worktree").setup({
 				-- change_directory_command = <str> -- default: "cd",
 				-- update_on_change = <boolean> -- default: true,
@@ -1231,6 +1489,34 @@ require("lazy").setup({
 				":lua require('telescope').extensions.git_worktree.create_git_worktree()<cr>",
 				desc = "Git worktree add",
 			},
+		},
+	},
+	{
+		"yorickpeterse/nvim-pqf",
+		config = true,
+	},
+	{
+		"akinsho/git-conflict.nvim",
+		version = "*",
+		opts = {
+			default_mappings = false,
+			highlights = { -- They must have background color, otherwise the default color will be used
+				incoming = "DiffAdd",
+				current = "DiffText",
+			},
+			setup = function(_, opts)
+				vim.api.nvim_set_hl(0, "DiffText", { fg = "#ffffff", bg = "#1d3b40" })
+				vim.api.nvim_set_hl(0, "DiffAdd", { fg = "#ffffff", bg = "#1d3450" })
+				require("git-conflict").setup(opts)
+			end,
+		},
+		keys = {
+			{ "<leader>gcr", "<CMD>GitConflictRefresh<CR>", desc = "Refresh" },
+			{ "<leader>gcq", "<CMD>GitConflictListQf<CR>", desc = "All conflicts to quickfix" },
+			{ "<leader>gcc", "<CMD>GitConflictChooseOurs<CR>", desc = "Select our [c]urrent changes" },
+			{ "<leader>gci", "<CMD>GitConflictChooseTheirs<CR>", desc = "Select their [i]ncoming changes" },
+			{ "<leader>gcb", "<CMD>GitConflictChooseBoth<CR>", desc = "Select [b]oth changes" },
+			{ "<leader>gcn", "<CMD>GitConflictChooseNone<CR>", desc = "Select [n]one of the changes" },
 		},
 	},
 	{
@@ -1256,6 +1542,52 @@ require("lazy").setup({
 				-- next_bookmark[0-9] = "", -- Moves to the next bookmark of the same group type. Works by first going according to line number, and then according to buffer number.
 				-- prev_bookmark[0-9] = "", -- Moves to the previous bookmark of the same group type. Works by first going according to line number, and then according to buffer number.
 				-- annotate = "", -- Prompts the user for a virtual line annotation that is then placed above the bookmark. Requires neovim 0.6+ and is not mapped by default.
+			},
+		},
+	},
+	{
+		"folke/trouble.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		opts = {
+			-- your configuration comes here
+			-- or leave it empty to use the default settings
+			-- refer to the configuration section below
+		},
+	},
+	{
+		"dgagn/diagflow.nvim",
+		event = "LspAttach",
+		opts = {
+			-- placement = "inline",
+			-- inline_padding_left = 3,
+		},
+	},
+	{
+		"zbirenbaum/copilot.lua",
+		event = "InsertEnter",
+		cmd = "Copilot",
+		opts = {
+			panel = {
+				enabled = false,
+				keymap = {
+					jump_prev = "[[",
+					jump_next = "]]",
+					accept = "<CR>",
+					refresh = "gr",
+					open = "<M-CR>",
+				},
+			},
+			suggestion = {
+				enabled = false, -- Using cmp source instead
+				auto_trigger = false,
+				keymap = {
+					accept = "<M-l>",
+					accept_word = false,
+					accept_line = false,
+					next = "<M-]>",
+					prev = "<M-[>",
+					dismiss = "<C-]>",
+				},
 			},
 		},
 	},
