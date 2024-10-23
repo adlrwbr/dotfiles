@@ -221,97 +221,88 @@ require("lazy").setup({
 	{
 		"folke/which-key.nvim",
 		event = "VeryLazy",
-		config = function()
+		dependencies = { "echasnovski/mini.icons", version = "*" },
+		keys = {
+			{
+				"<leader>?",
+				function()
+					require("which-key").show({ global = false })
+				end,
+				desc = "Buffer Local Keymaps (which-key)",
+			},
+		},
+		opts = {
+			-- your configuration comes here
+			-- or leave it empty to use the default settings
+			-- refer to the configuration section below
+			plugins = {
+				marks = false, -- shows a list of your marks on ' and `
+				registers = false, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+				spelling = {
+					enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+					suggestions = 20, -- how many suggestions should be shown in the list?
+				},
+				presets = {
+					operators = false,
+					motions = false,
+					text_objects = false,
+				},
+			},
+			--- You can add any mappings here, or use `require('which-key').add()` later
+			---@type wk.Spec
+			spec = {
+				{ "<leader>s", group = "🔎Search" },
+				{ "<leader>t", group = "Treesitter" },
+
+				{ "<leader>g", group = "Git" },
+				{ "<leader>gt", desc = "Toggle" },
+				{ "<leader>gd", desc = "Diffview" },
+				{ "<leader>gc", desc = "Git Conflict" },
+
+				{ "<leader>n", group = "Neovim" },
+				{ "<leader>nc", ":e ~/.config/nvim/init.lua<CR>", desc = "Edit Config" },
+
+				{ "<leader>c", ":clo<CR>", desc = "Close window" },
+				{ "<leader>h", "<cmd>noh<cr>", desc = "No Highlight" },
+				{ "<leader>,", "A,<esc>", desc = "Trailing Comma" },
+				{ "<leader>;", "A;<esc>", desc = "Trailing Semi" },
+
+				{ "<leader>p", group = "Plugins" },
+				{ "<leader>pi", "<cmd>Lazy install<cr>", desc = "Install" },
+				{ "<leader>ps", "<cmd>Lazy sync<cr>", desc = "Sync" },
+				{ "<leader>pS", "<cmd>Lazy clear<cr>", desc = "Status" },
+				{ "<leader>pc", "<cmd>Lazy clean<cr>", desc = "Clean" },
+				{ "<leader>pu", "<cmd>Lazy update<cr>", desc = "Update" },
+				{ "<leader>pp", "<cmd>Lazy profile<cr>", desc = "Profile" },
+				{ "<leader>pl", "<cmd>Lazy log<cr>", desc = "Log" },
+				{ "<leader>pd", "<cmd>Lazy debug<cr>", desc = "Debug" },
+
+				{
+					{ "<leader>b", group = "Buffers" },
+					{ "<leader>bj", "<cmd>BufferLinePick<cr>", desc = "Jump" },
+					{ "<leader>bf", "<cmd>Telescope buffers previewer=false<cr>", desc = "Find" },
+					{ "<leader>bc", "<cmd>bdelete<cr>", desc = "Close" },
+					-- { "<leader>bb", "<cmd>BufferLineCyclePrev<cr>", desc = "Previous" },
+					{ "<leader>bn", "<cmd>BufferLineCycleNext<cr>", desc = "Next" },
+					{ "<leader>bW", "<cmd>noautocmd w<cr>", desc = "Save without formatting (noautocmd)" },
+					-- { "<leader>bw", "<cmd>BufferWipeout<cr>", desc = "Wipeout" }, -- TODO: implement this for bufferline
+					{ "<leader>be", "<cmd>BufferLinePickClose<cr>", desc = "Pick which buffer to close" },
+					{ "<leader>bh", "<cmd>BufferLineCloseLeft<cr>", desc = "Close all to the left" },
+					{ "<leader>bl", "<cmd>BufferLineCloseRight<cr>", desc = "Close all to the right" },
+					{ "<leader>bD", "<cmd>BufferLineSortByDirectory<cr>", desc = "Sort by directory" },
+					{ "<leader>bL", "<cmd>BufferLineSortByExtension<cr>", desc = "Sort by language" },
+				},
+
+				{ "<leader>d", group = "Debug" },
+				{ "<leader>l", group = "LSP" },
+				{ "<leader>lf", group = "Format" },
+			},
+		},
+		config = function(_, opts)
 			vim.o.timeout = true
 			vim.o.timeoutlen = 500
 			local wk = require("which-key")
-			wk.setup({
-				-- your configuration comes here
-				-- or leave it empty to use the default settings
-				-- refer to the configuration section below
-				plugins = {
-					marks = false, -- shows a list of your marks on ' and `
-					registers = false, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
-					spelling = {
-						enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
-						suggestions = 20, -- how many suggestions should be shown in the list?
-					},
-					presets = {
-						operators = false,
-						motions = false,
-						text_objects = false,
-					},
-				},
-			})
-			wk.register({
-				s = {
-					name = "🔎Search", -- optional group name
-					-- f = { "<cmd>Telescope find_files<cr>", "Find File" }, -- create a binding with label
-					-- e = "Just a label", -- Just a label
-					-- ["1"] = "which_key_ignore", -- special label to hide it in the popup
-					-- b = { function() print("bar") end, "Foobar" }, -- you can also pass functions!
-				},
-				g = {
-					name = "Git",
-					t = { name = "Toggle" },
-					d = { name = "Diffview" },
-					c = { name = "Git Conflict" },
-				},
-				c = { ":clo<CR>", "Close window" },
-				n = {
-					name = "Neovim",
-					c = { ":e ~/.config/nvim/init.lua<CR>", "Edit Config" },
-				},
-				t = { name = "Treesitter" },
-				h = { "<cmd>noh<cr>", "No Highlight" },
-				[","] = { "A,<esc>", "Trailing Comma" },
-				[";"] = { "A;<esc>", "Trailing Semi" },
-				p = {
-					name = "Plugins",
-					i = { "<cmd>Lazy install<cr>", "Install" },
-					s = { "<cmd>Lazy sync<cr>", "Sync" },
-					S = { "<cmd>Lazy clear<cr>", "Status" },
-					c = { "<cmd>Lazy clean<cr>", "Clean" },
-					u = { "<cmd>Lazy update<cr>", "Update" },
-					p = { "<cmd>Lazy profile<cr>", "Profile" },
-					l = { "<cmd>Lazy log<cr>", "Log" },
-					d = { "<cmd>Lazy debug<cr>", "Debug" },
-				},
-				b = {
-					name = "Buffers",
-					j = { "<cmd>BufferLinePick<cr>", "Jump" },
-					f = { "<cmd>Telescope buffers previewer=false<cr>", "Find" },
-					c = { "<cmd>bdelete<cr>", "Close" },
-					-- b = { "<cmd>BufferLineCyclePrev<cr>", "Previous" },
-					n = { "<cmd>BufferLineCycleNext<cr>", "Next" },
-					W = { "<cmd>noautocmd w<cr>", "Save without formatting (noautocmd)" },
-					-- w = { "<cmd>BufferWipeout<cr>", "Wipeout" }, -- TODO: implement this for bufferline
-					e = {
-						"<cmd>BufferLinePickClose<cr>",
-						"Pick which buffer to close",
-					},
-					h = { "<cmd>BufferLineCloseLeft<cr>", "Close all to the left" },
-					l = {
-						"<cmd>BufferLineCloseRight<cr>",
-						"Close all to the right",
-					},
-					D = {
-						"<cmd>BufferLineSortByDirectory<cr>",
-						"Sort by directory",
-					},
-					L = {
-						"<cmd>BufferLineSortByExtension<cr>",
-						"Sort by language",
-					},
-				},
-				d = {
-					name = "Debug",
-				},
-				l = {
-					name = "LSP",
-					f = { name = "Format" },
-				},
-			}, { prefix = "<leader>" })
+			wk.setup(opts)
 		end,
 	},
 	{
@@ -322,7 +313,55 @@ require("lazy").setup({
 	{
 		"max397574/better-escape.nvim",
 		opts = {
-			mapping = { "kj" },
+			mappings = {
+				i = {
+					--  first_key[s]
+					j = {
+						--  second_key[s]
+						k = "<Esc>",
+						j = "<Esc>",
+					},
+					k = {
+						--  second_key[s]
+						k = "<Esc>",
+						j = "<Esc>",
+					},
+				},
+				c = {
+					j = {
+						k = "<Esc>",
+						j = "<Esc>",
+					},
+					k = {
+						k = "<Esc>",
+						j = "<Esc>",
+					},
+				},
+				t = {
+					j = {
+						k = "<C-\\><C-n>",
+					},
+					k = {
+						j = "<C-\\><C-n>",
+					},
+				},
+				v = {
+					j = {
+						k = "<Esc>",
+					},
+					k = {
+						j = "<Esc>",
+					},
+				},
+				s = {
+					j = {
+						k = "<Esc>",
+					},
+					k = {
+						j = "<Esc>",
+					},
+				},
+			},
 		},
 	},
 	{
@@ -386,11 +425,11 @@ require("lazy").setup({
 			},
 			{
 				"<leader>sg",
-				function()
+				function(_, opts)
 					local pickers = require("telescope.pickers")
 					local finders = require("telescope.finders")
 					local conf = require("telescope.config").values
-					list = vim.fn.systemlist("git diff --name-only main")
+					local list = vim.fn.systemlist("git diff --name-only main")
 
 					pickers
 						.new(opts, {
@@ -463,18 +502,18 @@ require("lazy").setup({
 			"nvimtools/none-ls.nvim", -- an actively maintained fork of null-ls
 
 			-- Autocompletion
-			"hrsh7th/nvim-cmp",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-			"saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-nvim-lua",
-			{
-				"zbirenbaum/copilot-cmp",
-				dependencies = "zbirenbaum/copilot.lua",
-				opts = {},
-			},
+			-- "hrsh7th/nvim-cmp",
+			-- "hrsh7th/cmp-nvim-lsp",
+			-- "hrsh7th/cmp-buffer",
+			-- "hrsh7th/cmp-path",
+			-- "hrsh7th/cmp-cmdline",
+			-- "saadparwaiz1/cmp_luasnip",
+			-- "hrsh7th/cmp-nvim-lua",
+			-- {
+			-- 	"zbirenbaum/copilot-cmp",
+			-- 	dependencies = "zbirenbaum/copilot.lua",
+			-- 	opts = {},
+			-- },
 
 			-- Snippets
 			"L3MON4D3/LuaSnip",
@@ -556,70 +595,70 @@ require("lazy").setup({
 				handlers = {},
 			})
 
-			-- Extend lsp-zero cmp configs
-			local cmp = require("cmp")
-			local cmp_action = require("lsp-zero").cmp_action()
-			local cmp_format = require("lsp-zero").cmp_format()
-			-- `/` cmdline setup.
-			cmp.setup.cmdline({ "/", "?" }, {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = {
-					{ name = "buffer" },
-				},
-			})
-			-- `:` cmdline setup.
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
-			})
+			-- -- Extend lsp-zero cmp configs
+			-- local cmp = require("cmp")
+			-- local cmp_action = require("lsp-zero").cmp_action()
+			-- local cmp_format = require("lsp-zero").cmp_format()
+			-- -- `/` cmdline setup.
+			-- cmp.setup.cmdline({ "/", "?" }, {
+			-- 	mapping = cmp.mapping.preset.cmdline(),
+			-- 	sources = {
+			-- 		{ name = "buffer" },
+			-- 	},
+			-- })
+			-- -- `:` cmdline setup.
+			-- cmp.setup.cmdline(":", {
+			-- 	mapping = cmp.mapping.preset.cmdline(),
+			-- 	sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
+			-- })
 			require("luasnip.loaders.from_vscode").lazy_load()
-			cmp.setup({
-				-- TODO: enter to insert, ctrl-enter to replace
-				preselect = cmp.PreselectMode.None,
-				sources = {
-					{ name = "nvim_lsp" },
-					{ name = "path" },
-					{ name = "buffer" },
-					{ name = "nvim_lua" },
-					{ name = "luasnip" },
-					{ name = "copilot" },
-				},
-				snippet = {
-					expand = function(args)
-						require("luasnip").lsp_expand(args.body)
-					end,
-				},
-				formatting = cmp_format,
-				completion = {
-					completeopt = "menu, meunone, noselect, preview",
-					-- Override trigger characters to ignore closing tag: see https://github.com/hrsh7th/nvim-cmp/issues/1055
-					get_trigger_characters = function(trigger_characters)
-						local new_trigger_characters = {}
-						for _, char in ipairs(trigger_characters) do
-							if char ~= ">" then
-								table.insert(new_trigger_characters, char)
-							end
-						end
-						return new_trigger_characters
-					end,
-				},
-				experimental = {
-					ghost_text = { hl_group = "LspCodeLens" },
-				},
-				-- extend default mappings
-				mapping = cmp.mapping.preset.insert({
-					-- `Enter` key to confirm completion
-					["<CR>"] = cmp.mapping.confirm({ select = false }),
-					-- Ctrl+Space to trigger completion menu
-					["<C-Space>"] = cmp.mapping.complete(),
-					-- Navigate between snippet placeholder
-					["<A-l>"] = cmp_action.luasnip_jump_forward(),
-					["<A-h>"] = cmp_action.luasnip_jump_backward(),
-					-- Scroll up and down in the completion documentation
-					["<C-u>"] = cmp.mapping.scroll_docs(-4),
-					["<C-d>"] = cmp.mapping.scroll_docs(4),
-				}),
-			})
+			-- cmp.setup({
+			-- 	-- TODO: enter to insert, ctrl-enter to replace
+			-- 	preselect = cmp.PreselectMode.None,
+			-- 	sources = {
+			-- 		{ name = "nvim_lsp" },
+			-- 		{ name = "path" },
+			-- 		{ name = "buffer" },
+			-- 		{ name = "nvim_lua" },
+			-- 		{ name = "luasnip" },
+			-- 		{ name = "copilot" },
+			-- 	},
+			-- 	snippet = {
+			-- 		expand = function(args)
+			-- 			require("luasnip").lsp_expand(args.body)
+			-- 		end,
+			-- 	},
+			-- 	formatting = cmp_format,
+			-- 	completion = {
+			-- 		completeopt = "menu, meunone, noselect, preview",
+			-- 		-- Override trigger characters to ignore closing tag: see https://github.com/hrsh7th/nvim-cmp/issues/1055
+			-- 		get_trigger_characters = function(trigger_characters)
+			-- 			local new_trigger_characters = {}
+			-- 			for _, char in ipairs(trigger_characters) do
+			-- 				if char ~= ">" then
+			-- 					table.insert(new_trigger_characters, char)
+			-- 				end
+			-- 			end
+			-- 			return new_trigger_characters
+			-- 		end,
+			-- 	},
+			-- 	experimental = {
+			-- 		ghost_text = { hl_group = "LspCodeLens" },
+			-- 	},
+			-- 	-- extend default mappings
+			-- 	mapping = cmp.mapping.preset.insert({
+			-- 		-- `Enter` key to confirm completion
+			-- 		["<CR>"] = cmp.mapping.confirm({ select = false }),
+			-- 		-- Ctrl+Space to trigger completion menu
+			-- 		["<C-Space>"] = cmp.mapping.complete(),
+			-- 		-- Navigate between snippet placeholder
+			-- 		["<A-l>"] = cmp_action.luasnip_jump_forward(),
+			-- 		["<A-h>"] = cmp_action.luasnip_jump_backward(),
+			-- 		-- Scroll up and down in the completion documentation
+			-- 		["<C-u>"] = cmp.mapping.scroll_docs(-4),
+			-- 		["<C-d>"] = cmp.mapping.scroll_docs(4),
+			-- 	}),
+			-- })
 		end,
 		keys = {
 			{ "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
@@ -649,6 +688,64 @@ require("lazy").setup({
 			{ "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document Symbols" },
 			{ "<leader>lS", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace Symbols" },
 			{ "<leader>le", "<cmd>Telescope quickfix<cr>", desc = "Telescope Quickfix" },
+		},
+	},
+	{
+		"saghen/blink.cmp",
+		lazy = false, -- lazy loading handled internally
+		-- optional: provides snippets for the snippet source
+		dependencies = "rafamadriz/friendly-snippets",
+
+		-- use a release tag to download pre-built binaries
+		version = "v0.*",
+		-- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+		-- build = 'cargo build --release',
+
+		opts = {
+			highlight = {
+				-- sets the fallback highlight groups to nvim-cmp's highlight groups
+				-- useful for when your theme doesn't support blink.cmp
+				-- will be removed in a future release, assuming themes add support
+				use_nvim_cmp_as_default = true,
+			},
+			-- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+			-- adjusts spacing to ensure icons are aligned
+			nerd_font_variant = "normal",
+
+			-- experimental auto-brackets support
+			accept = { auto_brackets = { enabled = true } },
+
+			-- experimental signature help support
+			trigger = { signature_help = { enabled = true } },
+
+			-- sources = {
+			-- 	providers = {
+			-- 		{
+			-- 			{ name = "blink.cmp.sources.lsp", score_offset = 1 },
+			-- 			{ name = "blink.cmp.sources.path" },
+			-- 			{ name = "blink.cmp.sources.snippets", score_offset = 1 },
+			-- 			{ name = "blink.cmp.sources.buffer", score_offset = -1 },
+			-- 		},
+			-- 	},
+			-- },
+			--
+			-- for keymap, all values may be string | string[]
+			-- use an empty table to disable a keymap
+			keymap = {
+				show = "<C-space>",
+				hide = "<C-e>",
+				accept = "<Tab>",
+				select_prev = { "<Up>", "<C-p>" },
+				select_next = { "<Down>", "<C-n>" },
+
+				show_documentation = {},
+				hide_documentation = {},
+				scroll_documentation_up = "<C-u>",
+				scroll_documentation_down = "<C-d>",
+
+				snippet_forward = "<Tab>",
+				snippet_backward = "<S-Tab>",
+			},
 		},
 	},
 	{
@@ -1560,6 +1657,28 @@ require("lazy").setup({
 		opts = {
 			-- placement = "inline",
 			-- inline_padding_left = 3,
+		},
+	},
+	{
+		"mistricky/codesnap.nvim", -- also see ray.so for a web alternative
+		build = "make",
+		cmd = {
+			"CodeSnap",
+			"CodeSnapSave",
+		},
+		keys = {
+			-- { "<leader>pc", "<cmd>CodeSnap<cr>", mode = "x", desc = "Save selected code snapshot into clipboard" },
+			-- { "<leader>ps", "<cmd>CodeSnapSave<cr>", mode = "x", desc = "Save selected code snapshot in /tmp" },
+		},
+		opts = {
+			save_path = "/tmp",
+			has_breadcrumbs = true,
+			bg_theme = "default",
+			watermark = "",
+			mac_window_bar = true,
+			code_font_family = "JetBrains Mono Nerd Font",
+			has_line_number = false,
+			show_workspace = false,
 		},
 	},
 	{
